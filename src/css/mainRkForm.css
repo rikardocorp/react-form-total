@@ -1,0 +1,76 @@
+html body .was-validated .form-control:valid:focus,
+html body .form-control.is-valid:focus,
+html body .was-validated .custom-select:valid:focus,
+html body .custom-select.is-valid:focus {
+  border-color: #9e9e9e !important;
+  -webkit-box-shadow: 0 0 0 0.15rem rgba(75, 75, 80, 0.16);
+  box-shadow: 0 0 0 0.15rem rgba(75, 75, 80, 0.16); }
+
+html body .was-validated .form-control:valid,
+html body .form-control.is-valid,
+html body .was-validated .custom-select:valid,
+html body .custom-select.is-valid {
+  border-color: #9e9e9e; }
+
+html body .form-group .rk-radio.is-invalid ~ .invalid-feedback,
+html body .form-group .input-group.is-invalid ~ .invalid-feedback {
+  display: block; }
+
+html body .form-group .rk-radio.is-invalid label::before, html body .form-group .rk-radio.is-invalid label::after {
+  color: #ff8491; }
+
+html body .form-group .input-group.is-invalid > div > .input-group-text {
+  background: #ff8491;
+  border: 1px solid #dc3445;
+  color: white; }
+html body .form-group .input-group.is-invalid > div > .input-group-text i {
+  color: white !important; }
+
+html body .form-group .rk-multiselect {
+  border: none;
+  padding: 0 !important;
+  height: auto; }
+
+html body .form-group .input-group > .form-control.rk-multiselect:not(:first-child) > div, html body .form-group .input-group > .form-control.rk-multiselectTag:not(:first-child) > div {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0; }
+
+html body .form-group .input-group > .form-control.rk-multiselect:not(:last-child) > div, html body .form-group .input-group > .form-control.rk-multiselectTag:not(:last-child) > div {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0; }
+
+html body .form-group .rk-multiselectTag {
+  border: none;
+  padding: 0 !important;
+  height: auto; }
+
+html body .form-group .bootstrap-switch.wrapper {
+  min-height: auto;
+  height: auto; }
+
+html body .form-group .rk-datetime {
+  border: none;
+  padding: 0 !important;
+  height: auto; }
+html body .form-group .rk-datetime.rdt-static.rdtOpen .rdtPicker {
+  position: relative;
+  display: inline-block;
+  top: 0; }
+html body .form-group .rk-datetime.rdt-static.rdtOpen .rdtPicker:before, html body .form-group .rk-datetime.rdt-static.rdtOpen .rdtPicker:after {
+  content: none !important; }
+html body .form-group .rk-datetime.is-invalid input {
+  border-color: #dc3545 !important; }
+html body .form-group .rk-datetime.is-valid input {
+  border-color: #9e9e9e; }
+
+html body .form-group .input-group > .form-control.rk-datetime:not(:first-child) > input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0; }
+
+html body .form-group .input-group > .form-control.rk-datetime:not(:last-child) > input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0; }
+
+.rkForm.rkForm-disabled > div{
+  opacity: 0.5;
+}
