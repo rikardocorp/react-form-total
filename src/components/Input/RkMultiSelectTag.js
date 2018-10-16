@@ -12,7 +12,7 @@ const components = {
 const createOption = (label, key, optionLabel, optionValue) => ({
   [optionLabel]: label,
   [optionValue]: label,
-  key
+  key: Math.random().toString(36).substr(2, 9)
 })
 
 class RkMultiSelectTag extends Component {
@@ -71,7 +71,6 @@ class RkMultiSelectTag extends Component {
     } else {
       const value = this.state.value
       const {isValid, msgError} = checkValidity(value, this.state.rules)
-      // console.log(value, isValid, msgError)
       this.setState({
         value: value,
         touched: true,
@@ -108,7 +107,17 @@ class RkMultiSelectTag extends Component {
     let conteValue = []
     value.map(it => {
       if (typeof it === 'object') {
-        conteValue.push(it)
+        if (it.key === undefined) {
+          console.group('MULTISELECT TAG: CHANGE VALUE')
+          console.info('Multiselect tag, the object dont have "key" value')
+          console.groupEnd('END')
+        } else if (it[optionValue] === undefined || it[optionLabel] === undefined) {
+          console.group('MULTISELECT TAG: CHANGE VALUE')
+          console.info('Multiselect tag, the object dont have "optionValue = ' + optionValue + '" or "optionLabel = ' + optionLabel + '"')
+          console.groupEnd('END')
+        } else {
+          conteValue.push(it)
+        }
       } else {
         conteValue.push(createOption(it, conteValue.length, optionLabel, optionValue))
       }

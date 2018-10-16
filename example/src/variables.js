@@ -118,6 +118,7 @@ export const test = {
         isDisabled: false,
         optionValue: 'id',
         optionLabel: 'label1',
+        returnValue: 'label1',
         menuIsOpen: undefined,
         // optionDisabled: (option) => option.user !== 'inge',
         options: [
@@ -125,7 +126,7 @@ export const test = {
           { id: 2, value1: 'strawberry', label1: 'Strawberry', user: 'inge2' },
           { id: 3, value1: 'vanilla', label1: 'Vanilla', user: 'inge3' }
         ],
-        // value: { value1: 'chocolate', label1: 'Chocolate', user: 'inge' }
+        value: { id: 1, value1: 'chocolate', label1: 'Chocolate', user: 'inge' }
       },
       rules: {
         required
@@ -144,20 +145,21 @@ export const test = {
         _prepend: <span className='input-group-text'><i className='fa fa-rocket text-secondary' /></span>,
         type: 'multiSelectAdd',
         placeholder: 'multi Select Add',
-        isMulti: true,
+        isMulti: false,
         isDisabled: false,
-        optionValue: 'value1',
+        optionValue: 'id',
         optionLabel: 'label1',
         addOption: false,
         menuIsOpen: undefined,
         menuStatic: false,
         // optionDisabled: (option) => (option.user !== 'inge' && option.user !== undefined),
         options: [
-          { value1: 'chocolate', label1: 'Chocolate', user: 'inge' },
-          { value1: 'strawberry', label1: 'Strawberry', user: 'inge2' },
-          { value1: 'vanilla', label1: 'Vanilla', user: 'inge3' }
+          { id: 1, value1: 'chocolate', label1: 'Chocolate', user: 'inge' },
+          { id: 2, value1: 'strawberry', label1: 'Strawberry', user: 'inge2' },
+          { id: 3, value1: 'vanilla', label1: 'Vanilla', user: 'inge3' }
         ],
-        value: [{ value1: 'strawberry', label1: 'Strawberry' }, { value1: 'chocolate', label1: 'Chocolate' }, { value1: 'rick', label1: 'Rick' }]
+        value: [1, 2]
+        // value: [{ id: 1, value1: 'chocolate', label1: 'Chocolate', user: 'inge' },{ id: 2, value1: 'strawberry', label1: 'Strawberry', user: 'inge2' }]
       },
       rules: {
         required

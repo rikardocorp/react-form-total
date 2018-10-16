@@ -23,32 +23,109 @@ class RkMultiSelectAdd extends Component {
     _localProps: {}
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.state.updateProps) {
-      const value = this.props.inputProps.value
-      this.setState({value: value, updateProps: false})
-      if (this.props.changed) {
-        const name = this.props.inputProps.name
+  // componentDidUpdate (prevProps, prevState) {
+  //   if (this.state.updateProps) {
+  //     const value = this.props.inputProps.value
+  //     this.setState({value: value, updateProps: false})
+  //     if (this.props.changed) {
+  //       const name = this.props.inputProps.name
+  //       this.props.changed(name, value)
+  //     }
+  //   }
+  // }
+  // componentWillReceiveProps (nextProps) {
+  //   if (nextProps.inputProps.value) {
+  //     this.setState({updateProps: true})
+  //   }
+  // }
+
+  evaluateNewValue = (newValue, isMulti, optionValue, options) => {
+    let value = null
+    if (isMulti) {
+      newValue = Array.isArray(newValue) ? newValue : [newValue]
+
+      if (Array.isArray(newValue)) {
+        if (typeof newValue[0] !== 'object') {
+          const auxValue = (newValue.toString()).split(',')
+          newValue = options.filter(it => auxValue.includes(it[optionValue].toString()))
+          value = newValue.length > 0 ? newValue : null
+        } else {
+          value = newValue
+        }
+      } else {
+        if (typeof newValue !== 'object') {
+          newValue = options.filter(it => it[optionValue].toString() === newValue.toString())
+          value = newValue.length > 0 ? newValue : null
+        } else {
+          value = newValue
+        }
+      }
+    } else {
+      if (!Array.isArray(newValue)) {
+        if (typeof newValue !== 'object') {
+          newValue = options.filter(it => it[optionValue].toString() === newValue.toString())
+          value = newValue.length > 0 ? newValue[0] : null
+        } else {
+          value = newValue
+        }
+      } else {
+        console.group('MULTISELECT: CHANGE VALUE')
+        console.info('Single multiselect isMulti=false, value does not expects ARRAY')
+        console.groupEnd('END')
+        value = null
+      }
+    }
+    return value
+  }
+
+  handlerChangeValueAuxiliar = (newValue, cen = true, validate = true) => {
+    let value = newValue
+    const {isMulti = false, optionValue = 'id', options = [], returnValue = null} = {
+      ...this.props.inputProps,
+      ...this.state._localProps
+    }
+    if (cen) {
+      value = this.evaluateNewValue(newValue, isMulti, optionValue, options)
+    }
+    const name = this.props.inputProps.name
+
+    let _isValid = true
+    let _msgError = ''
+    if (validate) {
+      const {isValid, msgError} = checkValidity(value, this.state.rules)
+      _isValid = isValid
+      _msgError = msgError
+    }
+
+    this.setState({
+      value: value,
+      valid: _isValid,
+      message: _msgError,
+      showMessage: true
+    })
+
+    if (this.props.changed) {
+      if (returnValue && value) {
+        if (Array.isArray(value)) {
+          value = value.map(it => it[returnValue])
+          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
+        } else {
+          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
+        }
+      } else {
         this.props.changed(name, value)
       }
     }
   }
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.inputProps.value) {
-      this.setState({updateProps: true})
-    }
-  }
+
   componentWillMount () {
     // INIT VALUES BY DEFAULT
     if (this.props.inputProps.value) {
-      const value = (this.props.inputProps.value) ? this.props.inputProps.value : null
-      this.setState({value: value})
-      if (this.props.changed) {
-        const name = this.props.inputProps.name
-        this.props.changed(name, value)
-      }
+      const value = this.props.inputProps.value ? this.props.inputProps.value : null
+      this.handlerChangeValueAuxiliar(value, true, false)
     }
   }
+
   componentDidMount () {
     // SET HANDLER FUNCTIONS
     if (this.props.inputProps.name) {
@@ -72,13 +149,11 @@ class RkMultiSelectAdd extends Component {
   }
 
   handlerTouched = () => {
-    // console.log('resetTouched TAGS INPUT')
     if (this.state.touched) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
       const {isValid, msgError} = checkValidity(value, this.state.rules)
-      // console.log(value, isValid, msgError)
       this.setState({
         value: value,
         touched: true,
@@ -106,44 +181,57 @@ class RkMultiSelectAdd extends Component {
     const {isValid} = checkValidity(value, this.state.rules)
     return isValid
   }
-  handlerChangeValue = (newValue, action = 'create-option') => {
+  handlerChangeValue = (newValue, action = 'create-option', cen = true, validate = true) => {
     let data = {}
+
+    let value = newValue
+    const {localOptions} = this.state
+    const {addOption = false, isMulti = false, optionValue = 'id'} = {
+      ...this.props.inputProps,
+      ...this.state._localProps
+    }
+    if (cen) {
+      value = this.evaluateNewValue(newValue, isMulti, optionValue, localOptions)
+    }
+
     switch (action) {
       case 'create-option':
-        const props = {...this.props.inputProps, ...this.state._localProps}
-        const {addOption = false} = props
         if (addOption) {
-          const {localOptions} = this.state
-          if (Array.isArray(newValue)) {
-            const total = newValue.length
-            localOptions.push(newValue[total - 1])
+          if (Array.isArray(value)) {
+            const total = value.length
+            localOptions.push(value[total - 1])
           } else {
-            localOptions.push(newValue)
+            if (value !== null) localOptions.push(value)
           }
-          data = { value: newValue, localOptions }
+          data = { value: value, localOptions }
         } else {
-          data = { value: newValue }
+          data = { value: value }
         }
         break
       default:
-        console.log(' -- default-option')
-        data = { value: newValue }
+        data = { value: value }
     }
 
-    console.log('ADD')
     const name = this.props.inputProps.name
-    const {isValid, msgError} = checkValidity(newValue, this.state.rules)
+
+    let _isValid = true
+    let _msgError = ''
+    if (validate) {
+      const {isValid, msgError} = checkValidity(value, this.state.rules)
+      _isValid = isValid
+      _msgError = msgError
+    }
+
     const setData = {
       ...data,
-      valid: isValid,
-      message: msgError,
+      valid: _isValid,
+      message: _msgError,
       showMessage: true
     }
 
     this.setState(setData)
-    console.log(this.props.inputProps.options)
     if (this.props.changed) {
-      this.props.changed(name, (newValue && newValue.length > 0) ? newValue : null)
+      this.props.changed(name, value)
     }
   }
   handlerChangeProps = (newProps = null, newRules = undefined) => {
@@ -151,15 +239,12 @@ class RkMultiSelectAdd extends Component {
     if (typeof newProps === 'object' || newProps === null) {
       this.setState(state => {
         if (newProps === null) {
-          console.log('CHANGED PROPS MULTISLCT ADD 1')
-          console.log(this.props.inputProps.options)
           return {
             rules: rules,
             _localProps: {},
             localOptions: this.props.inputProps.options
           }
         } else {
-          console.log('CHANGED PROPS MULTISLCT ADD 2')
           const localOptions = Array.isArray(newProps.options) ? newProps.options : state.localOptions
           return {
             rules: rules,
@@ -171,6 +256,9 @@ class RkMultiSelectAdd extends Component {
           }
         }
       })
+    }
+    if (newProps !== null && newProps.isMulti !== undefined) {
+      this.handlerChangeValue(null, null, false, false)
     }
   }
   handlerDisabledInput = (value) => {
@@ -186,7 +274,7 @@ class RkMultiSelectAdd extends Component {
   }
 
   handleChange = (newValue, {action}) => {
-    this.handlerChangeValue(newValue, action)
+    this.handlerChangeValue(newValue, action, false)
   }
 
   isValidNewOption = (inputValue, selectValue, selectOptions) => {

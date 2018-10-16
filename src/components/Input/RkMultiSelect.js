@@ -19,32 +19,27 @@ class RkMultiSelect extends Component {
     _localProps: {}
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.state.updateProps) {
-      const value = this.props.inputProps.value
-      this.setState({value: value, updateProps: false})
-      if (this.props.changed) {
-        const name = this.props.inputProps.name
-        this.props.changed(name, value)
-      }
-    }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.inputProps.value) {
-      this.setState({updateProps: true})
-    }
-  }
+  // componentDidUpdate (prevProps, prevState) {
+  //   if (this.state.updateProps) {
+  //     const value = this.props.inputProps.value
+  //     this.setState({value: value, updateProps: false})
+  //     if (this.props.changed) {
+  //       const name = this.props.inputProps.name
+  //       this.props.changed(name, value)
+  //     }
+  //   }
+  // }
+  // componentWillReceiveProps (nextProps) {
+  //   if (nextProps.inputProps.value) {
+  //     this.setState({updateProps: true})
+  //   }
+  // }
 
   componentWillMount () {
     // INIT VALUES BY DEFAULT
     if (this.props.inputProps.value) {
       const value = this.props.inputProps.value ? this.props.inputProps.value : ''
-      this.setState({value: value})
-      if (this.props.changed) {
-        const name = this.props.inputProps.name
-        this.props.changed(name, value)
-      }
+      this.handlerChangeValue(value, true, false)
     }
   }
 
@@ -68,13 +63,11 @@ class RkMultiSelect extends Component {
   }
 
   handlerTouched = () => {
-    // console.log('resetTouched SELECT')
     if (this.state.touched) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
       const {isValid, msgError} = checkValidity(value, this.state.rules)
-      // console.log(value, isValid, msgError)
       this.setState({
         value: value,
         touched: true,
@@ -102,26 +95,82 @@ class RkMultiSelect extends Component {
     const {isValid} = checkValidity(value, this.state.rules)
     return isValid
   }
-  handlerChangeValue = (newValue, cen = true) => {
+
+  evaluateNewValue = (newValue, isMulti, optionValue, options) => {
+    let value = null
+    if (isMulti) {
+      newValue = Array.isArray(newValue) ? newValue : [newValue]
+
+      if (Array.isArray(newValue)) {
+        if (typeof newValue[0] !== 'object') {
+          const auxValue = (newValue.toString()).split(',')
+          newValue = options.filter(it => auxValue.includes(it[optionValue].toString()))
+          value = newValue.length > 0 ? newValue : null
+        } else {
+          value = newValue
+        }
+      } else {
+        if (typeof newValue !== 'object') {
+          newValue = options.filter(it => it[optionValue].toString() === newValue.toString())
+          value = newValue.length > 0 ? newValue : null
+        } else {
+          value = newValue
+        }
+      }
+    } else {
+      if (!Array.isArray(newValue)) {
+        if (typeof newValue !== 'object') {
+          newValue = options.filter(it => it[optionValue].toString() === newValue.toString())
+          value = newValue.length > 0 ? newValue[0] : null
+        } else {
+          value = newValue
+        }
+      } else {
+        console.group('MULTISELECT: CHANGE VALUE')
+        console.info('Single multiselect isMulti=false, value does not expects ARRAY')
+        console.groupEnd('END')
+        value = null
+      }
+    }
+    return value
+  }
+  handlerChangeValue = (newValue, cen = true, validate = true) => {
     let value = newValue
+    const {isMulti = false, optionValue = 'id', options = [], returnValue = null} = {
+      ...this.props.inputProps,
+      ...this.state._localProps
+    }
     if (cen) {
-      const isMulti = this.props.inputProps.isMulti
-      value = isMulti && Array.isArray(newValue) ? newValue : [newValue]
-      console.log('[[ handlerChangeValue ]]')
-      console.log(value)
-      value.map(it => {})
+      value = this.evaluateNewValue(newValue, isMulti, optionValue, options)
     }
     const name = this.props.inputProps.name
-    const {isValid, msgError} = checkValidity(value, this.state.rules)
+
+    let _isValid = true
+    let _msgError = ''
+    if (validate) {
+      const {isValid, msgError} = checkValidity(value, this.state.rules)
+      _isValid = isValid
+      _msgError = msgError
+    }
 
     this.setState({
       value: value,
-      valid: isValid,
-      message: msgError,
+      valid: _isValid,
+      message: _msgError,
       showMessage: true
     })
+
     if (this.props.changed) {
-      this.props.changed(name, value)
+      if (returnValue && value) {
+        if (Array.isArray(value)) {
+          value = value.map(it => it[returnValue])
+          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
+        } else {
+          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
+        }
+      } else {
+        this.props.changed(name, value)
+      }
     }
   }
   handlerChangeProps = (newProps = null, newRules = undefined) => {
@@ -143,6 +192,9 @@ class RkMultiSelect extends Component {
           }
         }
       })
+    }
+    if (newProps !== null && newProps.isMulti !== undefined) {
+      this.handlerChangeValue(null, false, false)
     }
   }
   handlerDisabledInput = (value) => {
@@ -175,12 +227,14 @@ class RkMultiSelect extends Component {
       invalid = !this.state.valid ? !this.state.valid : undefined
     }
     const {
+      returnValue = null,
       menuStatic = false,
       isMulti = false,
       isDisabled = false,
       optionLabel = 'label',
       optionValue = 'value',
       optionDisabled = null,
+      closeMenuOnSelect = null,
       _prepend = null,
       _append = null,
       value,
@@ -207,6 +261,11 @@ class RkMultiSelect extends Component {
       })
     }
 
+    let _closeMenuOnSelect = closeMenuOnSelect
+    if (closeMenuOnSelect === null) {
+      _closeMenuOnSelect = !isMulti
+    }
+
     let conteInput = null
     const input = (
       <Select
@@ -216,6 +275,7 @@ class RkMultiSelect extends Component {
         getOptionLabel={(option) => (option[optionLabel])}
         isOptionDisabled={optionDisabled}
         value={value}
+        closeMenuOnSelect={_closeMenuOnSelect}
         isDisabled={isDisabled}
         isMulti={isMulti}
         styles={customStyles}

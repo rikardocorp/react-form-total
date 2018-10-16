@@ -75,17 +75,22 @@ export default class App extends Component {
             </div>
 
             <div className='groupButton mt-3'>
-              <Button size='sm' color='success' onClick={() => this.state.form1.$change('input5', { id: 3, value1: 'vanilla', label1: 'Vanilla' })}>Change MultiSelect Input5</Button>
+              {/*<Button size='sm' color='success' onClick={() => this.state.form1.$change('input5', [{ id: 3, value1: 'rikardocorp', label1: 'rikardocorp' }])}>Change MultiSelect Input5</Button>*/}
+              {/*<Button size='sm' color='success' onClick={() => this.state.form1.$change('input5', { id: 3, value1: 'vanilla', label1: 'Vanilla' })}>Change MultiSelect Input5.0</Button>*/}
+              <Button size='sm' color='success' onClick={() => this.state.form1.$change('input5', [1, 3, 100])}>Change MultiSelect Input5.1</Button>
               <Button size='sm' color='success' onClick={() => this.state.form1.$changeProps('input5', {isMulti: true})}>Change Props MultiSelect Input5</Button>
+              {/*<Button size='sm' color='success' onClick={() => this.state.form1.$changeProps('input5', {isMulti: false})}>Change Props MultiSelect Input5.1</Button>*/}
             </div>
 
             <div className='groupButton mt-3'>
-              <Button size='sm' color='danger' onClick={() => this.state.form1.$change('input6', [{ value1: 'strawberry', label1: 'Strawberry' }, { value1: 'item1', label1: 'Item1' }])}>Change MultiSelectADD Input6</Button>
+              {/*<Button size='sm' color='danger' onClick={() => this.state.form1.$change('input6', [{ id: 2, value1: 'strawberry', label1: 'Strawberry', user: 'inge2' }, { id: 3, value1: 'vanilla', label1: 'Vanilla', user: 'inge3' }])}>Change MultiSelectADD Input6</Button>*/}
+              <Button size='sm' color='danger' onClick={() => this.state.form1.$change('input6', [2, 3, 6])}>Change MultiSelectADD Input6</Button>
               <Button size='sm' color='danger' onClick={() => this.state.form1.$changeProps('input6', {addOption: true, isMulti: false, _prepend: null})}>Change Props MultiSelectADD Input6</Button>
             </div>
 
             <div className='groupButton mt-3'>
               <Button size='sm' color='secondary' onClick={() => this.state.form1.$change('input7', ['Item1', 'Item2', 'Item3', 'Item4'])}>Change MultiSelectADD Input7</Button>
+              <Button size='sm' color='secondary' onClick={() => this.state.form1.$change('input7', [{value1: '12', label1: 'rikardocorp', key: 1}])}>Change MultiSelectADD Input7</Button>
               <Button size='sm' color='secondary' onClick={() => this.state.form1.$changeProps('input7', {isDisabled: true, placeholder: 'The best Tag'})}>Change Props MultiSelectTag Input7</Button>
             </div>
 
