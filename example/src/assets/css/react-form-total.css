@@ -74,3 +74,7 @@ html body .form-group .input-group > .form-control.rk-datetime:not(:last-child) 
 .rkForm.rkForm-disabled > div{
   opacity: 0.5;
 }
+
+html body .form-group .is-invalid~.invalid-tooltip{
+  display: block;
+}

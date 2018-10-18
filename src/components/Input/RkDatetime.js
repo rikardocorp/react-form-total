@@ -17,6 +17,7 @@ const DEFAULT_RETURN_FORMAT = 'DD/MM/YYYY HH:mm:ss'
 class RkDatetime extends Component {
   state = {
     value: null,
+    outValue: null,
     defaultValue: null,
     valid: undefined,
     touched: false,
@@ -34,7 +35,7 @@ class RkDatetime extends Component {
       const dateEvaluate = this.generateDateValue(newValue)
       let _value = dateEvaluate[0]
       let _outValue = dateEvaluate[1]
-      this.setState({value: _value})
+      this.setState({value: _value, outValue: _outValue})
       if (this.props.changed) {
         this.props.changed(name, _outValue)
       }
@@ -46,12 +47,13 @@ class RkDatetime extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
+        this.handlerTouched,
         () => this.handlerReset(),
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps
+        this.handlerChangeProps,
+        this.getValue
       )
     }
     // INIT RULES
@@ -59,8 +61,10 @@ class RkDatetime extends Component {
     this.setState({rules: rules})
   }
 
-  handlerTouched = () => {
-    if (this.state.touched) {
+  getValue = () => this.state.outValue
+
+  handlerTouched = (isTouch) => {
+    if (!isTouch) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
@@ -77,6 +81,7 @@ class RkDatetime extends Component {
     const name = this.props.inputProps.name
     this.setState({
       value: null,
+      outValue: null,
       valid: undefined,
       touched: false,
       message: '',
@@ -99,6 +104,7 @@ class RkDatetime extends Component {
     const {isValid, msgError} = checkValidity(_value, this.state.rules)
     this.setState({
       value: _value,
+      outValue: _outValue,
       valid: isValid,
       message: msgError,
       showMessage: true
@@ -220,6 +226,7 @@ class RkDatetime extends Component {
       utc = true,
       _prepend = null,
       _append = null,
+      _tooltip = false,
       ...localProps} = props
 
     const paramsValidDate = this.generateCondition(validDateRange)
@@ -267,7 +274,7 @@ class RkDatetime extends Component {
     }
 
     return (
-      <RkValidate tooltip={this.props.tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
+      <RkValidate tooltip={_tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
         { conteInput }
       </RkValidate>
     )

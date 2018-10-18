@@ -1,5 +1,70 @@
+header {
+  padding: 0 0 100px;
+  background: rgb(38, 132, 255) linear-gradient(135deg, rgb(38, 132, 255) 0%, rgb(7, 71, 166) 100%);
+  /*background: rgb(255, 255, 255) linear-gradient(135deg, rgb(72, 72, 72) 0%, rgb(0, 0, 0) 100%);*/
+  color: white;
+}
 
+header ul.navbar-nav li a {
+  padding: 8px 25px !important;
+}
+
+.navbar{
+  background-color: rgba(0,0,0,0.11);
+  font-weight: 500;
+}
+
+.sidebar ul.nav li.nav-item a{
+  color: #46464b;
+  font-weight: 200;
+}
+
+.sidebar ul.nav li.nav-item a.active{
+  color: #1776f2;
+  font-weight: 500;
+}
+
+.banner h1 span{
+  font-size: 0.7em;
+  color: #ffffffa3;
+}
+
+
+@media (min-width: 992px) {
+  header {
+    padding: 0 0 100px;
+  }
+}
+
+section {
+  /*padding: 150px 0;*/
+  margin-bottom: 60px;
+}
 
 .groupButton button {
   margin-top: 5px;
+}
+
+/* Highlight */
+/*.hljs-function{*/
+  /*color: #0b84f3;*/
+/*}*/
+
+/*.hljs-params{*/
+  /*color: #fb5c86;*/
+/*}*/
+
+.content-menu .nav .nav-item{
+  margin-bottom: 10px;
+}
+.content-menu .nav .nav-item a{
+  cursor: pointer;
+}
+.content-menu .nav .nav-item a:hover{
+  color: #0e67db;
+  font-weight: 400;
+}
+
+.content-element h2{
+  margin-bottom: 25px;
 }

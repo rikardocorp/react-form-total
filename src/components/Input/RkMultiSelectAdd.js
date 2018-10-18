@@ -8,9 +8,9 @@ import CreatableSelect from 'react-select/lib/Creatable'
 
 class RkMultiSelectAdd extends Component {
   state = {
-    tooltip: false,
     inputValue: '',
     value: [],
+    outValue: null,
     defaultValue: '',
     valid: undefined,
     touched: false,
@@ -97,24 +97,26 @@ class RkMultiSelectAdd extends Component {
       _msgError = msgError
     }
 
+    let outValue = value
+    // if (returnValue && value) {
+    //   if (Array.isArray(value)) {
+    //     outValue = value.map(it => it[returnValue])
+    //     outValue = outValue[returnValue] === undefined ? outValue : outValue[returnValue]
+    //   } else {
+    //     outValue = outValue[returnValue] === undefined ? outValue : outValue[returnValue]
+    //   }
+    // }
+
     this.setState({
       value: value,
+      outValue: outValue,
       valid: _isValid,
       message: _msgError,
       showMessage: true
     })
 
     if (this.props.changed) {
-      if (returnValue && value) {
-        if (Array.isArray(value)) {
-          value = value.map(it => it[returnValue])
-          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
-        } else {
-          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
-        }
-      } else {
-        this.props.changed(name, value)
-      }
+      this.props.changed(name, outValue)
     }
   }
 
@@ -132,12 +134,13 @@ class RkMultiSelectAdd extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
+        this.handlerTouched,
         () => this.handlerReset(),
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps
+        this.handlerChangeProps,
+        this.getValue
       )
     }
     // INIT RULES
@@ -148,8 +151,10 @@ class RkMultiSelectAdd extends Component {
     this.setState({localOptions: options})
   }
 
-  handlerTouched = () => {
-    if (this.state.touched) {
+  getValue = () => this.state.outValue
+
+  handlerTouched = (isTouch) => {
+    if (!isTouch) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
@@ -167,6 +172,7 @@ class RkMultiSelectAdd extends Component {
     const name = this.props.inputProps.name
     this.setState({
       value: null,
+      outValue: null,
       valid: undefined,
       touched: false,
       message: '',
@@ -222,8 +228,11 @@ class RkMultiSelectAdd extends Component {
       _msgError = msgError
     }
 
+    const outValue = Array.isArray(value) && value.length === 0 ? null : value
+
     const setData = {
       ...data,
+      outValue: outValue,
       valid: _isValid,
       message: _msgError,
       showMessage: true
@@ -231,7 +240,7 @@ class RkMultiSelectAdd extends Component {
 
     this.setState(setData)
     if (this.props.changed) {
-      this.props.changed(name, value)
+      this.props.changed(name, outValue)
     }
   }
   handlerChangeProps = (newProps = null, newRules = undefined) => {
@@ -317,6 +326,7 @@ class RkMultiSelectAdd extends Component {
       options = [],
       _prepend = null,
       _append = null,
+      _tooltip = false,
       ...localProps} = props
 
     const { localOptions, value } = this.state
@@ -379,7 +389,7 @@ class RkMultiSelectAdd extends Component {
     }
 
     return (
-      <RkValidate tooltip={this.props.tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
+      <RkValidate tooltip={_tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
         { conteInput }
       </RkValidate>
     )

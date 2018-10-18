@@ -7,8 +7,8 @@ import Select from 'react-select'
 
 class RkMultiSelect extends Component {
   state = {
-    tooltip: false,
     value: '',
+    outValue: null,
     defaultValue: '',
     valid: undefined,
     touched: false,
@@ -49,12 +49,13 @@ class RkMultiSelect extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
+        this.handlerTouched,
         () => this.handlerReset(),
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps
+        this.handlerChangeProps,
+        this.getValue
       )
     }
     // INIT RULES
@@ -62,14 +63,16 @@ class RkMultiSelect extends Component {
     this.setState({rules: rules})
   }
 
-  handlerTouched = () => {
-    if (this.state.touched) {
+  getValue = () => this.state.outValue
+
+  handlerTouched = (isTouch) => {
+    if (!isTouch) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
       const {isValid, msgError} = checkValidity(value, this.state.rules)
       this.setState({
-        value: value,
+        // value: value,
         touched: true,
         valid: isValid,
         message: msgError,
@@ -81,6 +84,7 @@ class RkMultiSelect extends Component {
     const name = this.props.inputProps.name
     this.setState({
       value: null,
+      outValue: null,
       valid: undefined,
       touched: false,
       message: '',
@@ -153,24 +157,26 @@ class RkMultiSelect extends Component {
       _msgError = msgError
     }
 
+    let outValue = value
+    if (returnValue && value) {
+      if (Array.isArray(value)) {
+        outValue = value.map(it => it[returnValue])
+        outValue = outValue[returnValue] === undefined ? outValue : outValue[returnValue]
+      } else {
+        outValue = outValue[returnValue] === undefined ? outValue : outValue[returnValue]
+      }
+    }
+
     this.setState({
       value: value,
+      outValue: outValue,
       valid: _isValid,
       message: _msgError,
       showMessage: true
     })
 
     if (this.props.changed) {
-      if (returnValue && value) {
-        if (Array.isArray(value)) {
-          value = value.map(it => it[returnValue])
-          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
-        } else {
-          this.props.changed(name, value[returnValue] === undefined ? value : value[returnValue])
-        }
-      } else {
-        this.props.changed(name, value)
-      }
+      this.props.changed(name, outValue)
     }
   }
   handlerChangeProps = (newProps = null, newRules = undefined) => {
@@ -237,6 +243,7 @@ class RkMultiSelect extends Component {
       closeMenuOnSelect = null,
       _prepend = null,
       _append = null,
+      _tooltip = false,
       value,
       ...localProps} = props
 
@@ -299,7 +306,7 @@ class RkMultiSelect extends Component {
     }
 
     return (
-      <RkValidate tooltip={this.props.tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
+      <RkValidate tooltip={_tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
         { conteInput }
       </RkValidate>
     )

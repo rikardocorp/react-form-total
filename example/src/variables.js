@@ -2,7 +2,7 @@ import React from 'react'
 import {required, email, maxValue} from './assets/validity/validators/index'
 
 export const test = {
-  name: 'test',
+  name: 'form',
   url: '',
   post: {
     input1: null,
@@ -22,41 +22,40 @@ export const test = {
   },
   inputs: {
     input1: {
-      formGroup: {
-        row: false,
-        labelSize: {sm: 4, md: 6},
-        inputSize: {sm: 4, md: 6}
-      },
       label: {
         labelText: 'Input1',
-        className: ''
+        className: 'mt-1'
       },
       input: {
-        type: 'text',
+        type: 'number',
+        // contentClassName: 'mt-5 bg-primary',
+        // className: 'mt-5',
         // disabled: true,
         placeholder: 'Test Input1',
         _prepend: '@',
-        _append: '@'
+        // _append: '@',
+        _tooltip: true
       },
       rules: {
         required
       }
     },
     input2: {
+      size: {sm: 4, md: 12},
       formGroup: {
         row: false,
-        labelSize: {sm: 4, md: 6},
-        inputSize: {sm: 4, md: 6}
+        labelSize: {sm: 4, md: 3},
+        inputSize: {sm: 4, md: 9}
       },
       label: {
         labelText: 'Input2',
         className: ''
       },
       input: {
-        type: 'number',
+        type: 'text',
         // disabled: true,
         placeholder: 'Test Input2',
-        value: 5,
+        // value: 5,
         _prepend: '@'
         // _append: '@'
       },
@@ -67,6 +66,7 @@ export const test = {
     },
     __group_1: {
       input3: {
+        size: {sm: 4, md: 8},
         formGroup: {
           row: false,
           labelSize: {sm: 4, md: 6},
@@ -84,6 +84,7 @@ export const test = {
         }
       },
       input4: {
+        size: {sm: 8, md: 4},
         formGroup: {
           row: false,
           labelSize: {sm: 4, md: 6},
@@ -145,7 +146,7 @@ export const test = {
         _prepend: <span className='input-group-text'><i className='fa fa-rocket text-secondary' /></span>,
         type: 'multiSelectAdd',
         placeholder: 'multi Select Add',
-        isMulti: false,
+        isMulti: true,
         isDisabled: false,
         optionValue: 'id',
         optionLabel: 'label1',
@@ -158,7 +159,9 @@ export const test = {
           { id: 2, value1: 'strawberry', label1: 'Strawberry', user: 'inge2' },
           { id: 3, value1: 'vanilla', label1: 'Vanilla', user: 'inge3' }
         ],
-        value: [1, 2]
+        value: [{ id: 1, value1: 'chocolate', label1: 'Chocolate', user: 'inge' },
+          { id: 2, value1: 'strawberry', label1: 'Strawberry', user: 'inge2' },
+          { id: 20, value1: 'strawberry 20', label1: 'Strawberry 20' }]
         // value: [{ id: 1, value1: 'chocolate', label1: 'Chocolate', user: 'inge' },{ id: 2, value1: 'strawberry', label1: 'Strawberry', user: 'inge2' }]
       },
       rules: {
@@ -223,6 +226,7 @@ export const test = {
         // disabled: true,
         // position: 'right',
         // color: 'success',
+        _tooltip: true,
         options: [{value: 'Python', color: 'warning'}, {value: 'Javascript', color: 'danger'}, 'React']
         // value: 'Sistema'
       },

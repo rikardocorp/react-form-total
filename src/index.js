@@ -18,26 +18,35 @@ class RkForm extends Component {
 
   state = {
     items: {},
-    tooltip: false,
     disabled: false
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.render) return true
+    if (this.props.inputs !== undefined && this.props.inputs !== nextProps.inputs) return true
+    if (this.props.name !== undefined && this.props.name !== nextProps.name) return true
+    return false
   }
 
   componentWillMount () {
     // SET FORM FUNCTIONS
     const formName = this.props.name
     const _function = {
-      $touch: () => this.touchForm(),
+      $touch: this.touchForm,
       $reset: this.resetForm,
-      $isValid: () => this.validateForm(),
+      $isValid: this.validateForm,
       $disable: this.disableAllForm,
       $change: this.changeInputForm,
-      $changeProps: this.changeInputProps
+      $changeProps: this.changeInputProps,
+      $getValues: this.getInputForm
     }
-    this.props.inputFormHandler(formName, _function)
+    if (this.props.inputFormHandler) {
+      this.props.inputFormHandler(formName, _function)
+    }
   }
 
   // GET FUNCTION BY INPUTS
-  inputFunctions = (name, eventTouched, eventReset, eventIsValid, disableInput, changeValue, changeProps) => {
+  inputFunctions = (name, eventTouched, eventReset, eventIsValid, disableInput, changeValue, changeProps, getValue) => {
     this.setState(state => {
       return {
         items: {
@@ -49,38 +58,48 @@ class RkForm extends Component {
             $isValid: eventIsValid,
             $disable: disableInput,
             $change: changeValue,
-            $changeProps: changeProps
+            $changeProps: changeProps,
+            $getValue: getValue
           }
         }
       }
     })
   }
+  // GET VALUE
+  getInputForm = (key = null) => {
+    if (key === null) {
+      const obj = {}
+      Object.keys(this.state.items).map(it => {
+        obj[it] = this.state.items[it].$getValue()
+      })
+      return obj
+    } else {
+      if (this.state.items[key]) {
+        return this.state.items[key].$getValue()
+      }
+    }
+    return undefined
+  }
   // CHANGE VALUE
   changeInputForm = (key, value, extra = undefined) => {
-    console.log('changeInput')
-    console.log(key, value)
     if (this.state.items[key]) {
       this.state.items[key].$change(value, extra)
     }
   }
   // CHANGE INPUT PROPS
   changeInputProps = (key, value, extra = undefined) => {
-    console.log('changeInput')
-    console.log(key, value)
     if (this.state.items[key]) {
       this.state.items[key].$changeProps(value, extra)
     }
   }
   // RESET ALL INPUTS FORM
-  touchForm = () => {
+  touchForm = (isTouch = true) => {
     Object.keys(this.state.items).map(it => {
-      this.state.items[it].$touch()
+      this.state.items[it].$touch(isTouch)
     })
   }
   // DISABLE ALL FORM
   disableAllForm = (value) => {
-    console.log('disableAllForm')
-    console.log(value)
     Object.keys(this.state.items).map(it => {
       this.state.items[it].$disable(value)
     })
@@ -88,11 +107,8 @@ class RkForm extends Component {
   }
   // TOUCH ALL INPUTS FORM
   resetForm = (option = null) => {
-    console.log('RESET FORM')
-    console.log(option)
     if (option === '_all_') {
       Object.keys(this.state.items).map(it => {
-        console.log(it)
         this.state.items[it].$reset()
         this.state.items[it].$changeProps(null)
       })
@@ -121,7 +137,9 @@ class RkForm extends Component {
   // SET CHANGE VALUES FORM
   inputChanged = (name, value) => {
     const formName = this.props.name
-    this.props.inputChanged(formName, name, value)
+    if (this.props.inputChanged) {
+      this.props.inputChanged(formName, name, value)
+    }
   }
 
   render() {
@@ -148,7 +166,7 @@ class RkForm extends Component {
         }
         fInput = FormInputs[key]
       }
-      return <RkFormInput key={key} tooltip={this.state.tooltip} fields={fInput} render={render} changed={this.inputChanged} inputFunctions={this.inputFunctions} />
+      return <RkFormInput key={key} fields={fInput} render={render} changed={this.inputChanged} inputFunctions={this.inputFunctions} />
     })
 
     return (

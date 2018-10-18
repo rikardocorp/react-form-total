@@ -10,12 +10,12 @@ class RkRadio extends Component {
     inputProps: PropTypes.object,
     rules: PropTypes.object,
     getFunctions: PropTypes.func,
-    changed: PropTypes.func,
-    tooltip: PropTypes.bool
+    changed: PropTypes.func
   }
 
   state = {
     value: null,
+    outValue: null,
     valid: undefined,
     touched: false,
     message: '',
@@ -39,12 +39,13 @@ class RkRadio extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
+        this.handlerTouched,
         () => this.handlerReset(),
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps
+        this.handlerChangeProps,
+        this.getValue
       )
     }
     // INIT RULES
@@ -52,8 +53,10 @@ class RkRadio extends Component {
     this.setState({rules: rules})
   }
 
-  handlerTouched = () => {
-    if (this.state.touched) {
+  getValue = () => this.state.outValue
+
+  handlerTouched = (isTouch) => {
+    if (!isTouch) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
@@ -70,6 +73,7 @@ class RkRadio extends Component {
     const name = this.props.inputProps.name
     this.setState({
       value: null,
+      outValue: null,
       valid: undefined,
       touched: false,
       message: '',
@@ -90,6 +94,7 @@ class RkRadio extends Component {
     const {isValid, msgError} = checkValidity(value, this.state.rules)
     this.setState({
       value: value,
+      outValue: value,
       valid: isValid,
       message: msgError,
       showMessage: true
@@ -148,6 +153,7 @@ class RkRadio extends Component {
       color = null,
       disabled = false,
       className = '',
+      _tooltip = false,
       style = null} = props
     const name = this.props.inputProps.name
 
@@ -170,7 +176,7 @@ class RkRadio extends Component {
     })
 
     return (
-      <RkValidate tooltip={this.props.tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
+      <RkValidate tooltip={_tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
         <RadioGroup
           name='fruit'
           className={conteClassName}

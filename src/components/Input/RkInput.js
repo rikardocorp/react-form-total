@@ -5,8 +5,8 @@ import RkValidate from '../Validate/RkValidate'
 
 class RkInput extends Component {
   state = {
-    tooltip: false,
     value: '',
+    outValue: null,
     defaultValue: '',
     valid: undefined,
     touched: false,
@@ -17,29 +17,29 @@ class RkInput extends Component {
     _localProps: {}
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.state.updateProps) {
-      const value = this.props.inputProps.value
-      const outValue = this.props.type === 'number' ? Number(value) : value
-      this.setState({value: outValue, updateProps: false})
-      if (this.props.changed) {
-        const name = this.props.inputProps.name
-        this.props.changed(name, outValue)
-      }
-    }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.inputProps.value) {
-      this.setState({updateProps: true})
-    }
-  }
+  // componentDidUpdate (prevProps, prevState) {
+  //   if (this.state.updateProps) {
+  //     const value = this.props.inputProps.value
+  //     const outValue = this.props.type === 'number' ? Number(value) : value
+  //     this.setState({value: outValue, outValue: outValue, updateProps: false})
+  //     if (this.props.changed) {
+  //       const name = this.props.inputProps.name
+  //       this.props.changed(name, outValue)
+  //     }
+  //   }
+  // }
+  //
+  // componentWillReceiveProps (nextProps) {
+  //   if (nextProps.inputProps.value) {
+  //     this.setState({updateProps: true})
+  //   }
+  // }
 
   componentWillMount () {
     // INIT VALUES BY DEFAULT
     if (this.props.inputProps.value) {
       const value = this.props.inputProps.value ? this.props.inputProps.value : null
-      this.setState({value: value})
+      this.setState({value: value, outValue: value})
       if (this.props.changed) {
         const name = this.props.inputProps.name
         this.props.changed(name, value)
@@ -53,20 +53,24 @@ class RkInput extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
+        this.handlerTouched,
         () => this.handlerReset(),
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps)
+        this.handlerChangeProps,
+        this.getValue
+      )
     }
     // INIT RULES
     const rules = this.props.rules ? this.props.rules : {}
     this.setState({rules: rules})
   }
 
-  handlerTouched = () => {
-    if (this.state.touched) {
+  getValue = () => this.state.outValue
+
+  handlerTouched = (isTouch) => {
+    if (!isTouch) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
@@ -81,15 +85,16 @@ class RkInput extends Component {
   }
   handlerReset = () => {
     const name = this.props.inputProps.name
+    const outValue = this.props.type === 'number' ? 0 : ''
     this.setState({
       value: '',
+      outValue: outValue,
       valid: undefined,
       touched: false,
       message: '',
       showMessage: false
     })
     if (this.props.changed) {
-      const outValue = this.props.type === 'number' ? 0 : ''
       this.props.changed(name, outValue)
     }
   }
@@ -99,19 +104,18 @@ class RkInput extends Component {
     return isValid
   }
   handlerChangeValue = (newValue) => {
-    // console.log('handlerChangeValue')
-    // console.log(newValue)
     const name = this.props.inputProps.name
     const value = newValue
     const {isValid, msgError} = checkValidity(value, this.state.rules)
+    const outValue = this.props.type === 'number' ? Number(value) : value
     this.setState({
       value: value,
+      outValue: outValue,
       valid: isValid,
       message: msgError,
       showMessage: true
     })
     if (this.props.changed) {
-      const outValue = this.props.type === 'number' ? Number(value) : value
       this.props.changed(name, outValue)
     }
   }
@@ -166,19 +170,20 @@ class RkInput extends Component {
       valid = this.state.valid
       invalid = !this.state.valid ? !this.state.valid : undefined
     }
-    const {_prepend = null, _append = null, ...localProps} = props
+    const {_prepend = null, _append = null, _tooltip = false, contentClassName = '', ...localProps} = props
 
     let conteInput = null
     const input = (
       <Input {...localProps} onFocus={this.showErrorTooltip} onBlur={this.hiddenErrorTooltip} onChange={this.changeValue} valid={valid} invalid={invalid} />
     )
+
     const prepend = _prepend ? <InputGroupAddon addonType='prepend'>{_prepend}</InputGroupAddon> : null
     const append = _append ? <InputGroupAddon addonType='append'>{_append}</InputGroupAddon> : null
     if (append == null && prepend == null) {
       conteInput = input
     } else {
       conteInput = (
-        <InputGroup className={invalid ? 'is-invalid' : ''}>
+        <InputGroup className={(invalid ? 'is-invalid ' : '') + contentClassName}>
           { prepend }
           { input }
           { append }
@@ -187,7 +192,7 @@ class RkInput extends Component {
     }
 
     return (
-      <RkValidate tooltip={this.props.tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
+      <RkValidate tooltip={_tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
         { conteInput }
       </RkValidate>
     )

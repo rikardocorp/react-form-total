@@ -13,8 +13,8 @@ class RkCheckbox extends Component {
   }
   state = {
     cbId: Math.random().toString(16).slice(2),
-    tooltip: false,
     value: false,
+    outValue: false,
     touched: false,
     updateProps: false,
     _localProps: {}
@@ -39,15 +39,18 @@ class RkCheckbox extends Component {
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps
+        this.handlerChangeProps,
+        this.getValue
       )
     }
   }
 
+  getValue = () => this.state.outValue
+
   handlerTouched = () => {}
   handlerReset = () => {
     const name = this.props.inputProps.name
-    this.setState({value: false})
+    this.setState({value: false, outValue: false})
     if (this.props.changed) {
       this.props.changed(name, false)
     }
@@ -65,7 +68,8 @@ class RkCheckbox extends Component {
           this.props.changed(name, localValue)
         }
         return {
-          value: localValue
+          value: localValue,
+          outValue: localValue
         }
       })
       return
@@ -74,7 +78,7 @@ class RkCheckbox extends Component {
     } else {
       localValue = false
     }
-    this.setState({value: localValue})
+    this.setState({value: localValue, outValue: localValue})
 
     if (this.props.changed) {
       this.props.changed(name, localValue)

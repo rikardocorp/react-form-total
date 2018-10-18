@@ -17,9 +17,9 @@ const createOption = (label, key, optionLabel, optionValue) => ({
 
 class RkMultiSelectTag extends Component {
   state = {
-    tooltip: false,
     inputValue: '',
     value: [],
+    outValue: null,
     defaultValue: '',
     valid: undefined,
     touched: false,
@@ -30,16 +30,16 @@ class RkMultiSelectTag extends Component {
     _localProps: {}
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.state.updateProps) {
-      this.handlerChangeValue(this.props.inputProps.value, false)
-    }
-  }
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.inputProps.value) {
-      this.setState({updateProps: true})
-    }
-  }
+  // componentDidUpdate (prevProps, prevState) {
+  //   if (this.state.updateProps) {
+  //     this.handlerChangeValue(this.props.inputProps.value, false)
+  //   }
+  // }
+  // componentWillReceiveProps (nextProps) {
+  //   if (nextProps.inputProps.value) {
+  //     this.setState({updateProps: true})
+  //   }
+  // }
   componentWillMount () {
     // INIT VALUES BY DEFAULT
     if (this.props.inputProps.value) {
@@ -52,12 +52,13 @@ class RkMultiSelectTag extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
+        this.handlerTouched,
         () => this.handlerReset(),
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps
+        this.handlerChangeProps,
+        this.getValue
       )
     }
     // INIT RULES
@@ -65,14 +66,16 @@ class RkMultiSelectTag extends Component {
     this.setState({rules: rules})
   }
 
-  handlerTouched = () => {
-    if (this.state.touched) {
+  getValue = () => this.state.outValue
+
+  handlerTouched = (isTouch) => {
+    if (!isTouch) {
       this.setState({touched: false, valid: undefined})
     } else {
       const value = this.state.value
       const {isValid, msgError} = checkValidity(value, this.state.rules)
       this.setState({
-        value: value,
+        // value: value,
         touched: true,
         valid: isValid,
         message: msgError,
@@ -84,6 +87,7 @@ class RkMultiSelectTag extends Component {
     const name = this.props.inputProps.name
     this.setState({
       value: [],
+      outValue: null,
       valid: undefined,
       touched: false,
       message: '',
@@ -127,12 +131,13 @@ class RkMultiSelectTag extends Component {
       const {isValid, msgError} = checkValidity(conteValue, this.state.rules)
       this.setState({
         value: conteValue,
+        outValue: conteValue,
         updateProps: false,
         valid: isValid,
         message: msgError,
         showMessage: true})
     } else {
-      this.setState({value: conteValue, updateProps: false})
+      this.setState({value: conteValue, outValue: conteValue, updateProps: false})
     }
 
     if (this.props.changed) {
@@ -168,14 +173,16 @@ class RkMultiSelectTag extends Component {
   changeValue = (value, actionMeta) => {
     const name = this.props.inputProps.name
     const {isValid, msgError} = checkValidity(value, this.state.rules)
+    const outValue = (value && value.length > 0) ? value : null
     this.setState({
       value: value,
+      outValue: outValue,
       valid: isValid,
       message: msgError,
       showMessage: true
     })
     if (this.props.changed) {
-      this.props.changed(name, (value && value.length > 0) ? value : null)
+      this.props.changed(name, outValue)
     }
   }
   // SHOW MESSAGE TOOLTIP
@@ -209,6 +216,7 @@ class RkMultiSelectTag extends Component {
         this.setState({
           inputValue: '',
           value: localValue,
+          outValue: localValue,
           valid: isValid,
           message: msgError,
           showMessage: true
@@ -260,6 +268,7 @@ class RkMultiSelectTag extends Component {
       placeholder = 'Digite y presione enter...',
       _prepend = null,
       _append = null,
+      _tooltip = false,
       ...localProps} = props
     const { inputValue, value } = this.state
 
@@ -302,7 +311,7 @@ class RkMultiSelectTag extends Component {
       )
     }
     return (
-      <RkValidate tooltip={this.props.tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
+      <RkValidate tooltip={_tooltip} show={this.state.showMessage} message={this.state.message} valid={valid}>
         {conteInput}
       </RkValidate>
     )

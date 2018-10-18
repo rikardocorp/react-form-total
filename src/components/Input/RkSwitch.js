@@ -6,8 +6,8 @@ import Switch from 'react-bootstrap-switch'
 
 class RkSwitch extends Component {
   state = {
-    tooltip: false,
     value: true,
+    outValue: true,
     realValue: null,
     defaultValue: '',
     touched: false,
@@ -15,27 +15,27 @@ class RkSwitch extends Component {
     _localProps: {}
   }
 
-  componentDidUpdate (prevProps, prevState) {
-    if (this.state.updateProps) {
-      const value = this.props.inputProps.value
-      let newValue = false
-      if (typeof value === 'boolean') {
-        newValue = value
-      } else if(typeof value === 'number') {
-        newValue = !(value === 0)
-      }
-      this.setState({value: newValue, realValue: value, updateProps: false})
-      if (this.props.changed) {
-        const name = this.props.inputProps.name
-        this.props.changed(name, value)
-      }
-    }
-  }
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.inputProps.value !== undefined) {
-      this.setState({updateProps: true})
-    }
-  }
+  // componentDidUpdate (prevProps, prevState) {
+  //   if (this.state.updateProps) {
+  //     const value = this.props.inputProps.value
+  //     let newValue = false
+  //     if (typeof value === 'boolean') {
+  //       newValue = value
+  //     } else if (typeof value === 'number') {
+  //       newValue = !(value === 0)
+  //     }
+  //     this.setState({value: newValue, outValue: value, realValue: value, updateProps: false})
+  //     if (this.props.changed) {
+  //       const name = this.props.inputProps.name
+  //       this.props.changed(name, value)
+  //     }
+  //   }
+  // }
+  // componentWillReceiveProps (nextProps) {
+  //   if (nextProps.inputProps.value !== undefined) {
+  //     this.setState({updateProps: true})
+  //   }
+  // }
   componentWillMount () {
     // INIT VALUES BY DEFAULT
     if (this.props.inputProps.value !== undefined) {
@@ -47,7 +47,7 @@ class RkSwitch extends Component {
         newValue = !(value === 0)
       }
 
-      this.setState({value: newValue, realValue: value})
+      this.setState({value: newValue, outValue: value, realValue: value})
       if (this.props.changed) {
         const name = this.props.inputProps.name
         this.props.changed(name, value)
@@ -65,31 +65,21 @@ class RkSwitch extends Component {
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
-        this.handlerChangeProps
+        this.handlerChangeProps,
+        this.getValue
       )
     }
   }
 
-  handlerTouched = () => {
-    // console.log('resetTouched')
-    // if (this.state.touched) {
-    //     this.setState({touched: false, valid: undefined})
-    // } else {
-    //     const value = this.state.value
-    //     const {isValid, msgError} = checkValidity(value, this.state.rules)
-    //     this.setState({
-    //         touched: true,
-    //         valid: isValid,
-    //         message: msgError,
-    //         showMessage: true
-    //     })
-    // }
-  }
+  getValue = () => this.state.outValue
+
+  handlerTouched = () => {}
   handlerReset = () => {
     const name = this.props.inputProps.name
     const realValue = typeof this.state.realValue === 'number' ? 1 : true
     this.setState({
       value: true,
+      outValue: realValue,
       valid: undefined,
       touched: false,
       message: '',
@@ -130,6 +120,7 @@ class RkSwitch extends Component {
     const name = this.props.inputProps.name
     this.setState({
       value: value,
+      outValue: realValue,
       realValue: realValue
     })
     if (this.props.changed) {

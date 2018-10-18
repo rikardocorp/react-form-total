@@ -1,20 +1,20 @@
 import React, { Component } from 'react'
 import { FormGroup, Label, Input, Row, Col } from 'reactstrap'
+// import asyncComponent from '../../hoc/asyncComponent'
 import RkInput from '../Input/RkInput'
 import RkMultiSelect from '../Input/RkMultiSelect'
 import RkMultiSelectAdd from '../Input/RkMultiSelectAdd'
 import RkMultiSelectTag from '../Input/RkMultiSelectTag'
 import RkDatetime from '../Input/RkDatetime'
 import RkSwitch from '../Input/RkSwitch'
-// import RkSlider from '../Input/RkSlider'
 import RkCheckbox from '../Input/RkCheckbox'
 import RkRadio from '../Input/RkRadio'
 
 class RkFormInput extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('----- ----- UPDATE -------')
-    console.log(this.props)
-    console.log('--- --- --------- -------')
+    console.group('FORM INPUTS: Render Activate')
+    console.info('The props "render" is true, we recommend you to keep it in false')
+    console.groupEnd('END')
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -30,31 +30,31 @@ class RkFormInput extends Component {
     let opt = null
     switch (type) {
       case ('multiSelect'):
-        opt = <RkMultiSelect inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkMultiSelect inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} />
         break
       case ('multiSelectTag'):
-        opt = <RkMultiSelectTag inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkMultiSelectTag inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} />
         break
       case ('multiSelectAdd'):
-        opt = <RkMultiSelectAdd inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkMultiSelectAdd inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} />
         break
       case ('switch'):
-        opt = <RkSwitch inputProps={input} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkSwitch inputProps={input} changed={this.changed} getFunctions={this.props.inputFunctions} />
         break
       case ('checkbox'):
-        opt = <RkCheckbox inputProps={input} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkCheckbox inputProps={input} changed={this.changed} getFunctions={this.props.inputFunctions} />
         break
       case ('radio'):
-        opt = <RkRadio inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkRadio inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} />
         break
       case ('datetime'):
-        opt = <RkDatetime inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkDatetime inputProps={input} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} />
         break
       case ('plainText'):
         opt = <Input inputProps={input} plaintext>{ input.value }</Input>
         break
       default:
-        opt = <RkInput type={type} inputProps={{...input, type}} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} tooltip={this.props.tooltip} />
+        opt = <RkInput type={type} inputProps={{...input, type}} rules={rules} changed={this.changed} getFunctions={this.props.inputFunctions} />
     }
 
     return opt
