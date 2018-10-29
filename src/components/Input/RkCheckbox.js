@@ -8,12 +8,14 @@ class RkCheckbox extends Component {
   static propTypes = {
     name: PropTypes.string,
     inputProps: PropTypes.object,
+    grouping: PropTypes.object,
     getFunctions: PropTypes.func,
     changed: PropTypes.func
   }
   state = {
     cbId: Math.random().toString(16).slice(2),
     value: false,
+    disabled: false,
     outValue: false,
     touched: false,
     updateProps: false,
@@ -22,7 +24,7 @@ class RkCheckbox extends Component {
 
   componentWillMount () {
     // INIT VALUES BY DEFAULT
-    if (this.props.inputProps.value !== undefined) {
+    if (this.props.inputProps.value !== undefined || this.props.__value !== undefined) {
       const value = this.props.inputProps.value ? this.props.inputProps.value : false
       this.handlerChangeValue(value)
     }
@@ -35,7 +37,7 @@ class RkCheckbox extends Component {
       this.props.getFunctions(
         name,
         () => this.handlerTouched(),
-        () => this.handlerReset(),
+        this.handlerReset,
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
@@ -45,14 +47,25 @@ class RkCheckbox extends Component {
     }
   }
 
-  getValue = () => this.state.outValue
+  getValue = (group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      return this.state.outValue
+    }
+    return undefined
+  }
 
   handlerTouched = () => {}
-  handlerReset = () => {
-    const name = this.props.inputProps.name
-    this.setState({value: false, outValue: false})
-    if (this.props.changed) {
-      this.props.changed(name, false)
+  handlerReset = (group = null) => {
+    const props = {...this.props.inputProps, ...this.state._localProps}
+    const {name = ''} = props
+    const _grouping = this.props.grouping
+
+    if (group === null || _grouping[group]) {
+      this.setState({value: false, outValue: false, disabled: false})
+      if (this.props.changed) {
+        this.props.changed(name, false, true)
+      }
     }
   }
   handlerIsValidate = () => {
@@ -102,8 +115,17 @@ class RkCheckbox extends Component {
       })
     }
   }
-  handlerDisabledInput = (value) => {
-    this.handlerChangeProps({disabled: value})
+  handlerDisabledInput = (value = null, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (value !== this.state.disabled) {
+        this.setState(state => {
+          return {
+            disabled: value == null ? !state.disabled : value
+          }
+        })
+      }
+    }
   }
   // SET LOCAL CHANGE VALUE
   changeValue = () => {
@@ -111,9 +133,12 @@ class RkCheckbox extends Component {
   }
 
   render() {
-    const props = {
+    let props = {
       ...this.props.inputProps,
       ...this.state._localProps
+    }
+    if (this.state.disabled) {
+      props = props.disabled ? {disabled: this.state.disabled, ...props} : {...props, disabled: this.state.disabled}
     }
 
     const {label = 'test', position = 'left', color = null, disabled = false, className = '', style = null} = props

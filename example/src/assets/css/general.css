@@ -20,7 +20,7 @@ header ul.navbar-nav li a {
 }
 
 .sidebar ul.nav li.nav-item a.active{
-  color: #1776f2;
+  color: #3c3c3d;
   font-weight: 500;
 }
 
@@ -67,4 +67,12 @@ section {
 
 .content-element h2{
   margin-bottom: 25px;
+}
+
+.react-code {
+  font-size: .73em;
+  border: 1px solid #f1f1f1;
+  border-radius: 0.5em;
+  padding: 15px !important;
+  background: #fbfbfb !important;
 }

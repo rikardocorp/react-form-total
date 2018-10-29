@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactFormTotal from 'react-form-total'
-import {Button} from 'reactstrap'
+import {UncontrolledCollapse, Button} from 'reactstrap'
+import SyntaxHighlighter from 'react-syntax-highlighter'
 import {required, maxLength} from '../../assets/validity/validators/'
 
 const inputs = {
@@ -17,6 +18,9 @@ const inputs = {
       rules: {
         required,
         maxLength: maxLength(5)
+      },
+      grouping: {
+        group1: true
       }
     },
     input2: {
@@ -30,6 +34,9 @@ const inputs = {
       },
       rules: {
         required
+      },
+      grouping: {
+        group1: true
       }
     }
   },
@@ -41,10 +48,13 @@ const inputs = {
       type: 'multiSelect',
       optionValue: 'id',
       optionLabel: 'label',
-      options: [{id:1, label: 'React'}, {id:2, label: 'Vuejs'}, {id:3, label: 'Angular'}]
+      options: [{id: 1, label: 'React'}, {id: 2, label: 'Vuejs'}, {id: 3, label: 'Angular'}]
     },
     rules: {
       required
+    },
+    grouping: {
+      group1: true
     }
   },
   input4: {
@@ -106,7 +116,7 @@ const inputs = {
         type: 'checkbox',
         label: 'Select 1',
         position: 'left',
-        color: 'success',
+        color: 'success'
       }
     },
     input9: {
@@ -121,20 +131,32 @@ const inputs = {
         offText: 'NO',
         bsSize: 'small'
       }
-    },
+    }
   }
-
 }
+
+const functions = `
+const _function = {
+  $touch: //touch form show requirements,
+  $reset: //reset all the form or by groups,
+  $isValid: //is validate form ?,
+  $disable: //disable all the form or by groups,
+  $change: //change Input Value,
+  $changeProps: //change Input Props,
+  $changeExtraProps: //change label, formGroup and size props
+  $getValues: //get inputs values, by key, groups and all values
+  $hidden: // hide the input by name, groups or all inputs
+}`.trim()
 
 class SimpleExample extends Component {
   state = {
     form: {
-      name: 'form',
+      name: 'form'
     }
   }
 
   inputFormHandler = (forname, callbackControls) => {
-    this.setState(state =>{
+    this.setState(state => {
       return {
         [forname]: {
           ...state[forname],
@@ -150,16 +172,35 @@ class SimpleExample extends Component {
     console.log(data)
   }
 
+  handlerDisable = () => {
+    this.state.form.$disable(null)
+    // this.state.form.$disable(true)
+  }
+
   render() {
+    const codeString = functions
     return (
-      <ReactFormTotal name={this.state.form.name} inputs={inputs} inputFormHandler={this.inputFormHandler}>
-        <div className='clearfix'>
-          <Button color='secondary' className='float-left' onClick={() => this.state.form.$reset()}>$reset</Button>
-          <Button color='warning' className='float-left ml-2' onClick={() => this.state.form.$touch()}>$touch</Button>
-          <Button color='primary' className='float-right' onClick={this.handlerSubmit}>Submit</Button>
-        </div>
-      </ReactFormTotal>
-    );
+      <section>
+        <h2 className='clearfix'>Complete Form Example Controlled <Button id='toggler3' size='sm' className='float-right' color='link'>Show Code</Button></h2>
+        <UncontrolledCollapse toggler='#toggler3'>
+          <React.Fragment>
+            <p className='text-secondary pl-3'>Available functions to manage the component and modify the inputs.</p>
+            <SyntaxHighlighter className='react-code' style={this.props.styleCode}>
+              {codeString}
+            </SyntaxHighlighter>
+          </React.Fragment>
+        </UncontrolledCollapse>
+        <ReactFormTotal name={this.state.form.name} inputs={inputs} inputFormHandler={this.inputFormHandler} className='w-75 m-auto'>
+          <div className='clearfix'>
+            <Button color='danger' className='float-left' onClick={() => this.state.form.$reset()}>$reset</Button>
+            <Button color='secondary' className='float-left ml-2' onClick={() => this.state.form.$touch()}>$touch</Button>
+            <Button color='transparency' className='float-left ml-2' onClick={() => this.state.form.$hidden('group1', null, true)}>$hidden</Button>
+            <Button color='warning' className='float-left ml-2' onClick={this.handlerDisable}>$disable</Button>
+            <Button color='primary' className='float-right' onClick={this.handlerSubmit}>Submit</Button>
+          </div>
+        </ReactFormTotal>
+      </section>
+    )
   }
 }
 

@@ -8,6 +8,7 @@ class RkSwitch extends Component {
   state = {
     value: true,
     outValue: true,
+    disabled: false,
     realValue: null,
     defaultValue: '',
     touched: false,
@@ -15,27 +16,6 @@ class RkSwitch extends Component {
     _localProps: {}
   }
 
-  // componentDidUpdate (prevProps, prevState) {
-  //   if (this.state.updateProps) {
-  //     const value = this.props.inputProps.value
-  //     let newValue = false
-  //     if (typeof value === 'boolean') {
-  //       newValue = value
-  //     } else if (typeof value === 'number') {
-  //       newValue = !(value === 0)
-  //     }
-  //     this.setState({value: newValue, outValue: value, realValue: value, updateProps: false})
-  //     if (this.props.changed) {
-  //       const name = this.props.inputProps.name
-  //       this.props.changed(name, value)
-  //     }
-  //   }
-  // }
-  // componentWillReceiveProps (nextProps) {
-  //   if (nextProps.inputProps.value !== undefined) {
-  //     this.setState({updateProps: true})
-  //   }
-  // }
   componentWillMount () {
     // INIT VALUES BY DEFAULT
     if (this.props.inputProps.value !== undefined) {
@@ -60,8 +40,8 @@ class RkSwitch extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
-        () => this.handlerReset(),
+        this.handlerTouched,
+        this.handlerReset,
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
@@ -71,22 +51,34 @@ class RkSwitch extends Component {
     }
   }
 
-  getValue = () => this.state.outValue
+  getValue = (group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      return this.state.outValue
+    }
+    return undefined
+  }
 
   handlerTouched = () => {}
-  handlerReset = () => {
-    const name = this.props.inputProps.name
-    const realValue = typeof this.state.realValue === 'number' ? 1 : true
-    this.setState({
-      value: true,
-      outValue: realValue,
-      valid: undefined,
-      touched: false,
-      message: '',
-      showMessage: false
-    })
-    if (this.props.changed) {
-      this.props.changed(name, realValue)
+  handlerReset = (group = null) => {
+    const props = {...this.props.inputProps, ...this.state._localProps}
+    const {name = ''} = props
+    const _grouping = this.props.grouping
+
+    if (group === null || _grouping[group]) {
+      const realValue = typeof this.state.realValue === 'number' ? 1 : true
+      this.setState({
+        value: true,
+        outValue: realValue,
+        disabled: false,
+        valid: undefined,
+        touched: false,
+        message: '',
+        showMessage: false
+      })
+      if (this.props.changed) {
+        this.props.changed(name, realValue, true)
+      }
     }
   }
   handlerIsValidate = () => {
@@ -145,18 +137,30 @@ class RkSwitch extends Component {
       })
     }
   }
-  handlerDisabledInput = (value) => {
-    this.handlerChangeProps({disabled: value})
+  handlerDisabledInput = (value = null, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (value !== this.state.disabled) {
+        this.setState(state => {
+          return {
+            disabled: value == null ? !state.disabled : value
+          }
+        })
+      }
+    }
   }
   // SET LOCAL CHANGE VALUE
   changeValue = (el, state) => {
     this.handlerChangeValue(state, false)
   }
   render() {
-    const props = {
+    let props = {
       ...this.props.inputProps,
       ...this.state._localProps,
       value: this.state.value
+    }
+    if (this.state.disabled) {
+      props = props.disabled ? {disabled: this.state.disabled, ...props} : {...props, disabled: this.state.disabled}
     }
 
     const {position = 'center', ...localProps} = props

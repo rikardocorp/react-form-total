@@ -12,7 +12,8 @@ class RkForm extends Component {
     ]),
     inputFormHandler: PropTypes.func,
     inputChanged: PropTypes.func,
-    render: PropTypes.bool
+    render: PropTypes.bool,
+    className: PropTypes.string
     // isLoading: PropTypes.bool
   }
 
@@ -25,6 +26,7 @@ class RkForm extends Component {
     if (this.props.render) return true
     if (this.props.inputs !== undefined && this.props.inputs !== nextProps.inputs) return true
     if (this.props.name !== undefined && this.props.name !== nextProps.name) return true
+    if (this.props.children !== undefined && this.props.children !== nextProps.children) return true
     return false
   }
 
@@ -38,7 +40,9 @@ class RkForm extends Component {
       $disable: this.disableAllForm,
       $change: this.changeInputForm,
       $changeProps: this.changeInputProps,
-      $getValues: this.getInputForm
+      $changeExtraProps: this.changeExtraProps,
+      $getValues: this.getInputForm,
+      $hidden: this.hiddenInputForm
     }
     if (this.props.inputFormHandler) {
       this.props.inputFormHandler(formName, _function)
@@ -65,12 +69,27 @@ class RkForm extends Component {
       }
     })
   }
+  inputFunctionsFormGroup = (name, changeExtraProps, hiddenInput) => {
+    this.setState(state => {
+      return {
+        items: {
+          ...state.items,
+          [name]: {
+            ...state.items[name],
+            $changeExtraProps: changeExtraProps,
+            $hidden: hiddenInput
+          }
+        }
+      }
+    })
+  }
   // GET VALUE
-  getInputForm = (key = null) => {
-    if (key === null) {
+  getInputForm = (key = null, byGroup = false) => {
+    if (key === null || byGroup) {
       const obj = {}
       Object.keys(this.state.items).map(it => {
-        obj[it] = this.state.items[it].$getValue()
+        const value = this.state.items[it].$getValue(key)
+        if (value !== undefined) obj[it] = this.state.items[it].$getValue(key)
       })
       return obj
     } else {
@@ -79,6 +98,20 @@ class RkForm extends Component {
       }
     }
     return undefined
+  }
+  // HIDDEN
+  hiddenInputForm = (key = null, value = null, byGroup = false) => {
+    if (key === null || byGroup) {
+      Object.keys(this.state.items).map(it => {
+        this.state.items[it].$hidden(value, key)
+        this.state.items[it].$touch(false)
+      })
+    } else {
+      if (this.state.items[key]) {
+        this.state.items[key].$hidden(value)
+        this.state.items[key].$touch(false)
+      }
+    }
   }
   // CHANGE VALUE
   changeInputForm = (key, value, extra = undefined) => {
@@ -92,6 +125,12 @@ class RkForm extends Component {
       this.state.items[key].$changeProps(value, extra)
     }
   }
+  // CHANGE LABEL SIZE PROPS
+  changeExtraProps = (key, value) => {
+    if (this.state.items[key]) {
+      this.state.items[key].$changeExtraProps(value)
+    }
+  }
   // RESET ALL INPUTS FORM
   touchForm = (isTouch = true) => {
     Object.keys(this.state.items).map(it => {
@@ -99,23 +138,36 @@ class RkForm extends Component {
     })
   }
   // DISABLE ALL FORM
-  disableAllForm = (value) => {
+  disableAllForm = (value = null, group = null) => {
     Object.keys(this.state.items).map(it => {
-      this.state.items[it].$disable(value)
+      this.state.items[it].$disable(value, group)
     })
     this.setState({disabled: value})
   }
   // TOUCH ALL INPUTS FORM
   resetForm = (option = null) => {
-    if (option === '_all_') {
+    if (option === '_input_') {
       Object.keys(this.state.items).map(it => {
         this.state.items[it].$reset()
         this.state.items[it].$changeProps(null)
       })
-      this.setState({disabled: false})
+      if (this.state.disabled) this.setState({disabled: false})
+    } else if (option === '_all_') {
+      Object.keys(this.state.items).map(it => {
+        this.state.items[it].$changeExtraProps(null)
+        this.state.items[it].$reset()
+        this.state.items[it].$changeProps(null)
+        this.state.items[it].$disable(false, null)
+        this.state.items[it].$hidden(false)
+      })
+      if (this.state.disabled) this.setState({disabled: false})
+    } else if (option === '_extra_') {
+      Object.keys(this.state.items).map(it => {
+        this.state.items[it].$changeExtraProps(null)
+      })
     } else {
       Object.keys(this.state.items).map(it => {
-        this.state.items[it].$reset()
+        this.state.items[it].$reset(option)
       })
     }
   }
@@ -135,15 +187,15 @@ class RkForm extends Component {
     return isValidate
   }
   // SET CHANGE VALUES FORM
-  inputChanged = (name, value) => {
+  inputChanged = (name, value, isReset = false) => {
     const formName = this.props.name
     if (this.props.inputChanged) {
-      this.props.inputChanged(formName, name, value)
+      this.props.inputChanged(formName, name, value, isReset)
     }
   }
 
   render() {
-    const {children, inputs, render} = this.props
+    const {children, inputs, render, className = ''} = this.props
     const FormInputs = inputs
     const _inputs = Object.keys(FormInputs).map(key => {
       let fInput = null
@@ -166,11 +218,21 @@ class RkForm extends Component {
         }
         fInput = FormInputs[key]
       }
-      return <RkFormInput key={key} fields={fInput} render={render} changed={this.inputChanged} inputFunctions={this.inputFunctions} />
+      return (
+        <RkFormInput
+          key={key}
+          fields={fInput}
+          render={render}
+          changed={this.inputChanged}
+          inputFunctions={this.inputFunctions}
+          formGroupFunctions={this.inputFunctionsFormGroup} />
+      )
     })
 
+    const _className = 'rkForm form-horizontal ' + (className === '' ? '' : (className + ' '))
+
     return (
-      <form className={'rkForm form-horizontal ' + (this.state.disabled ? 'rkForm-disabled' : '')} autoComplete='off' >
+      <form className={_className + (this.state.disabled ? 'rkForm-disabled' : '')} autoComplete='off'>
         { _inputs }
         { children ? <div>{children}</div> : null }
       </form>
@@ -180,6 +242,7 @@ class RkForm extends Component {
 
 RkForm.defaultProps = {
   // isLoading: false,
+  className: '',
   render: false
 }
 

@@ -11,6 +11,7 @@ class RkMultiSelectAdd extends Component {
     inputValue: '',
     value: [],
     outValue: null,
+    disabled: false,
     defaultValue: '',
     valid: undefined,
     touched: false,
@@ -135,7 +136,7 @@ class RkMultiSelectAdd extends Component {
       this.props.getFunctions(
         name,
         this.handlerTouched,
-        () => this.handlerReset(),
+        this.handlerReset,
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
@@ -151,7 +152,13 @@ class RkMultiSelectAdd extends Component {
     this.setState({localOptions: options})
   }
 
-  getValue = () => this.state.outValue
+  getValue = (group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      return this.state.outValue
+    }
+    return undefined
+  }
 
   handlerTouched = (isTouch) => {
     if (!isTouch) {
@@ -168,18 +175,24 @@ class RkMultiSelectAdd extends Component {
       })
     }
   }
-  handlerReset = () => {
-    const name = this.props.inputProps.name
-    this.setState({
-      value: null,
-      outValue: null,
-      valid: undefined,
-      touched: false,
-      message: '',
-      showMessage: false
-    })
-    if (this.props.changed) {
-      this.props.changed(name, null)
+  handlerReset = (group = null) => {
+    const props = {...this.props.inputProps, ...this.state._localProps}
+    const {name = ''} = props
+    const _grouping = this.props.grouping
+
+    if (group === null || _grouping[group]) {
+      this.setState({
+        value: null,
+        outValue: null,
+        disabled: false,
+        valid: undefined,
+        touched: false,
+        message: '',
+        showMessage: false
+      })
+      if (this.props.changed) {
+        this.props.changed(name, null, true)
+      }
     }
   }
   handlerIsValidate = () => {
@@ -270,8 +283,17 @@ class RkMultiSelectAdd extends Component {
       this.handlerChangeValue(null, null, false, false)
     }
   }
-  handlerDisabledInput = (value) => {
-    this.handlerChangeProps({isDisabled: value})
+  handlerDisabledInput = (value = null, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (value !== this.state.disabled) {
+        this.setState(state => {
+          return {
+            disabled: value == null ? !state.disabled : value
+          }
+        })
+      }
+    }
   }
   // SHOW MESSAGE TOOLTIP
   showErrorTooltip = () => {
@@ -303,9 +325,12 @@ class RkMultiSelectAdd extends Component {
   }
 
   render() {
-    const props = {
+    let props = {
       ...this.props.inputProps,
       ...this.state._localProps
+    }
+    if (this.state.disabled) {
+      props = props.disabled ? {isDisabled: this.state.disabled, ...props} : {...props, isDisabled: this.state.disabled}
     }
 
     let valid

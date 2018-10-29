@@ -6,6 +6,7 @@ import RkValidate from '../Validate/RkValidate'
 class RkInput extends Component {
   state = {
     value: '',
+    disabled: false,
     outValue: null,
     defaultValue: '',
     valid: undefined,
@@ -17,27 +18,14 @@ class RkInput extends Component {
     _localProps: {}
   }
 
-  // componentDidUpdate (prevProps, prevState) {
-  //   if (this.state.updateProps) {
-  //     const value = this.props.inputProps.value
-  //     const outValue = this.props.type === 'number' ? Number(value) : value
-  //     this.setState({value: outValue, outValue: outValue, updateProps: false})
-  //     if (this.props.changed) {
-  //       const name = this.props.inputProps.name
-  //       this.props.changed(name, outValue)
-  //     }
-  //   }
-  // }
-  //
-  // componentWillReceiveProps (nextProps) {
-  //   if (nextProps.inputProps.value) {
-  //     this.setState({updateProps: true})
-  //   }
-  // }
+  componentDidUpdate (prevProps, prevState) {
+    // console.log('componentDidUpdate [input]')
+  }
 
   componentWillMount () {
+    // console.log('componentWillMount [input]')
     // INIT VALUES BY DEFAULT
-    if (this.props.inputProps.value) {
+    if (this.props.inputProps.value || this.props.__value) {
       const value = this.props.inputProps.value ? this.props.inputProps.value : null
       this.setState({value: value, outValue: value})
       if (this.props.changed) {
@@ -48,13 +36,14 @@ class RkInput extends Component {
   }
 
   componentDidMount () {
+    // console.log('componentDidMount [input]')
     // SET HANDLER FUNCTIONS
     if (this.props.inputProps.name) {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
         this.handlerTouched,
-        () => this.handlerReset(),
+        this.handlerReset,
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
@@ -67,7 +56,13 @@ class RkInput extends Component {
     this.setState({rules: rules})
   }
 
-  getValue = () => this.state.outValue
+  getValue = (group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      return this.state.outValue
+    }
+    return undefined
+  }
 
   handlerTouched = (isTouch) => {
     if (!isTouch) {
@@ -83,25 +78,35 @@ class RkInput extends Component {
       })
     }
   }
-  handlerReset = () => {
-    const name = this.props.inputProps.name
+  handlerReset = (group = null) => {
+    const props = {...this.props.inputProps, ...this.state._localProps}
+    const {name = ''} = props
+    const _grouping = this.props.grouping
     const outValue = this.props.type === 'number' ? 0 : ''
-    this.setState({
-      value: '',
-      outValue: outValue,
-      valid: undefined,
-      touched: false,
-      message: '',
-      showMessage: false
-    })
-    if (this.props.changed) {
-      this.props.changed(name, outValue)
+
+    if (group === null || _grouping[group]) {
+      this.setState({
+        value: '',
+        outValue: outValue,
+        // disabled: false,
+        valid: undefined,
+        touched: false,
+        message: '',
+        showMessage: false
+      })
+      if (this.props.changed) {
+        this.props.changed(name, outValue, true)
+      }
     }
   }
   handlerIsValidate = () => {
     const value = this.state.value
-    const {isValid} = checkValidity(value, this.state.rules)
-    return isValid
+    if (!this.props.hidden) {
+      const {isValid} = checkValidity(value, this.state.rules)
+      return isValid
+    } else {
+      return true
+    }
   }
   handlerChangeValue = (newValue) => {
     const name = this.props.inputProps.name
@@ -121,6 +126,7 @@ class RkInput extends Component {
   }
   handlerChangeProps = (newProps = null, newRules = undefined) => {
     let rules = (typeof newRules === 'object') ? {...newRules} : {...this.props.rules}
+    console.log('handlerChangeProps: ', newProps)
     if (typeof newProps === 'object' || newProps === null) {
       this.setState(state => {
         if (newProps === null) {
@@ -140,8 +146,17 @@ class RkInput extends Component {
       })
     }
   }
-  handlerDisabledInput = (value) => {
-    this.handlerChangeProps({disabled: value})
+  handlerDisabledInput = (value = null, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (value !== this.state.disabled) {
+        this.setState(state => {
+          return {
+            disabled: value == null ? !state.disabled : value
+          }
+        })
+      }
+    }
   }
   // SET LOCAL CHANGE VALUE
   changeValue = (el) => {
@@ -158,10 +173,14 @@ class RkInput extends Component {
   }
 
   render() {
-    const props = {
+    // console.log(' [RENDER] Input')
+    let props = {
       ...this.props.inputProps,
       ...this.state._localProps,
       value: this.state.value
+    }
+    if (this.state.disabled) {
+      props = props.disabled ? {disabled: this.state.disabled, ...props} : {...props, disabled: this.state.disabled}
     }
 
     let valid

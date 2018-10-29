@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Navbar, NavbarBrand, Container, Row, Col, NavbarToggler, UncontrolledCollapse, Nav, NavItem, NavLink} from 'reactstrap'
+import {Navbar, Container, Row, Col, NavbarToggler, UncontrolledCollapse, Nav, NavItem, NavLink} from 'reactstrap'
 import GitHubButton from 'react-github-button'
 import 'react-github-button/assets/style.css'
 
@@ -40,7 +40,7 @@ class Header extends Component {
         <Container className='mt-5 banner'>
           <Row className='d-flex justify-content-center'>
             <Col sm={12} md={11}>
-              <h1 className='font-weight-bold'>React Form Total <span>v1</span></h1>
+              <h1 className='font-weight-bold'>React Form Total <span>v2</span></h1>
               <p className='lead w-75'>This is a component to build a complete form, with validations and different types of inputs, using objects in JSON format.</p>
               <GitHubButton type='stargazers' size='large' namespace='rikardocorp' repo='react-form-total' />
             </Col>

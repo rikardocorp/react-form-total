@@ -8,6 +8,7 @@ class RkRadio extends Component {
   static propTypes = {
     name: PropTypes.string,
     inputProps: PropTypes.object,
+    grouping: PropTypes.object,
     rules: PropTypes.object,
     getFunctions: PropTypes.func,
     changed: PropTypes.func
@@ -16,6 +17,7 @@ class RkRadio extends Component {
   state = {
     value: null,
     outValue: null,
+    disabled: false,
     valid: undefined,
     touched: false,
     message: '',
@@ -40,7 +42,7 @@ class RkRadio extends Component {
       this.props.getFunctions(
         name,
         this.handlerTouched,
-        () => this.handlerReset(),
+        this.handlerReset,
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
@@ -53,7 +55,13 @@ class RkRadio extends Component {
     this.setState({rules: rules})
   }
 
-  getValue = () => this.state.outValue
+  getValue = (group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      return this.state.outValue
+    }
+    return undefined
+  }
 
   handlerTouched = (isTouch) => {
     if (!isTouch) {
@@ -69,18 +77,24 @@ class RkRadio extends Component {
       })
     }
   }
-  handlerReset = () => {
-    const name = this.props.inputProps.name
-    this.setState({
-      value: null,
-      outValue: null,
-      valid: undefined,
-      touched: false,
-      message: '',
-      showMessage: false
-    })
-    if (this.props.changed) {
-      this.props.changed(name, null)
+  handlerReset = (group = null) => {
+    const props = {...this.props.inputProps, ...this.state._localProps}
+    const {name = ''} = props
+    const _grouping = this.props.grouping
+
+    if (group === null || _grouping[group]) {
+      this.setState({
+        value: null,
+        outValue: null,
+        disabled: false,
+        valid: undefined,
+        touched: false,
+        message: '',
+        showMessage: false
+      })
+      if (this.props.changed) {
+        this.props.changed(name, null, true)
+      }
     }
   }
   handlerIsValidate = () => {
@@ -124,17 +138,29 @@ class RkRadio extends Component {
       })
     }
   }
-  handlerDisabledInput = (value) => {
-    this.handlerChangeProps({disabled: value})
+  handlerDisabledInput = (value = null, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (value !== this.state.disabled) {
+        this.setState(state => {
+          return {
+            disabled: value == null ? !state.disabled : value
+          }
+        })
+      }
+    }
   }
   changeValue = (value) => {
     this.handlerChangeValue(value)
   }
 
   render() {
-    const props = {
+    let props = {
       ...this.props.inputProps,
       ...this.state._localProps
+    }
+    if (this.state.disabled) {
+      props = props.disabled ? {disabled: this.state.disabled, ...props} : {...props, disabled: this.state.disabled}
     }
 
     let valid

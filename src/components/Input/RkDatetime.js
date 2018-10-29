@@ -18,6 +18,7 @@ class RkDatetime extends Component {
   state = {
     value: null,
     outValue: null,
+    disabled: false,
     defaultValue: null,
     valid: undefined,
     touched: false,
@@ -48,7 +49,7 @@ class RkDatetime extends Component {
       this.props.getFunctions(
         name,
         this.handlerTouched,
-        () => this.handlerReset(),
+        this.handlerReset,
         () => this.handlerIsValidate(),
         this.handlerDisabledInput,
         this.handlerChangeValue,
@@ -61,7 +62,13 @@ class RkDatetime extends Component {
     this.setState({rules: rules})
   }
 
-  getValue = () => this.state.outValue
+  getValue = (group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      return this.state.outValue
+    }
+    return undefined
+  }
 
   handlerTouched = (isTouch) => {
     if (!isTouch) {
@@ -77,18 +84,24 @@ class RkDatetime extends Component {
       })
     }
   }
-  handlerReset = () => {
-    const name = this.props.inputProps.name
-    this.setState({
-      value: null,
-      outValue: null,
-      valid: undefined,
-      touched: false,
-      message: '',
-      showMessage: false
-    })
-    if (this.props.changed) {
-      this.props.changed(name, null)
+  handlerReset = (group = null) => {
+    const props = {...this.props.inputProps, ...this.state._localProps}
+    const {name = ''} = props
+    const _grouping = this.props.grouping
+
+    if (group === null || _grouping[group]) {
+      this.setState({
+        value: null,
+        outValue: null,
+        disabled: false,
+        valid: undefined,
+        touched: false,
+        message: '',
+        showMessage: false
+      })
+      if (this.props.changed) {
+        this.props.changed(name, null, true)
+      }
     }
   }
   handlerIsValidate = () => {
@@ -134,8 +147,17 @@ class RkDatetime extends Component {
       })
     }
   }
-  handlerDisabledInput = (value) => {
-    this.handlerChangeProps({inputProps: {disabled: value}})
+  handlerDisabledInput = (value = null, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (value !== this.state.disabled) {
+        this.setState(state => {
+          return {
+            disabled: value == null ? !state.disabled : value
+          }
+        })
+      }
+    }
   }
   generateDateValue = (newValue, isUTC = undefined) => {
     if (newValue) {
@@ -206,11 +228,14 @@ class RkDatetime extends Component {
   }
 
   render() {
-    // let date = new Date()
-    const props = {
+    let props = {
       ...this.props.inputProps,
       ...this.state._localProps,
       value: this.state.value
+    }
+    if (this.state.disabled) {
+      const optDisabled = {inputProps: {...props.inputProps, disabled: this.state.disabled}}
+      props = props.disabled ? {...optDisabled, ...props} : {...props, ...optDisabled}
     }
 
     const {

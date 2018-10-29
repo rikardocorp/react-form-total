@@ -3,16 +3,17 @@ import { Link, Element } from 'react-scroll'
 import { StickyContainer, Sticky } from 'react-sticky'
 import { Nav, NavItem, Container, Row, Col } from 'reactstrap'
 import {gettingStarted} from '../codeText'
-import Highlight from 'react-highlight'
+// import Highlight from 'react-highlight'
 import '../../../node_modules/highlight.js/styles/atom-one-light.css'
 import Header from './Header'
 import SyntaxHighlighter from 'react-syntax-highlighter'
-import { docco } from 'react-syntax-highlighter/styles/hljs'
+import { tomorrow } from 'react-syntax-highlighter/styles/hljs'
 
 import SimpleExample from '../../views/examples/simpleExample'
 import SimpleExampleControlled from '../../views/examples/simpleExampleControlled'
 import CompleteExample from '../../views/examples/completeExample'
 
+const styleCode = tomorrow
 class FullPage extends Component {
   state = {
     width: null,
@@ -34,11 +35,11 @@ class FullPage extends Component {
   toggleModal = (data) => {
     console.log('toggleModal')
     console.log(data)
-    this.props.toggleModal(data)
+    this.props.toggleModal(data, true)
   }
 
   render() {
-    const {width, height} = this.state
+    const {height} = this.state
     return (
       <StickyContainer>
         <Header measure={this.measure} />
@@ -99,7 +100,7 @@ class FullPage extends Component {
                 <section>
                   <h2>Requirements</h2>
                   <p className='lead'>You need install the next packages:</p>
-                  <SyntaxHighlighter style={docco}>
+                  <SyntaxHighlighter className='react-code' style={styleCode}>
 {`$ npm install reactstrap --save\t
 $ npm install bootstrap --save\t
 $ npm install react-select --save\t
@@ -114,42 +115,33 @@ $ npm install react-bootstrap-switch --save\t`}
                 <section>
                   <h2>Getting Started</h2>
                   <p>Package is instalable via npm</p>
-                  <Highlight>
+                  <SyntaxHighlighter className='react-code' style={styleCode}>
                     {`$ npm install react-form-total --save`}
-                  </Highlight>
+                  </SyntaxHighlighter>
                   <br />
                   <p className='lead'>
                     We recommend you import the following styles.
                   </p>
-                  <Highlight>
-                    {`import 'bootstrap/dist/css/bootstrap.min.css'\n`}
-                    {`import './assets/css/font-awesome-4.7.0/css/font-awesome.min.css'\n`}
-                    {`import 'react-form-total/dist/assets/css/react-form-total.css'\n`}
-                    {`import 'react-form-total/dist/assets/css/checkbox_radio.css'\n`}
-                    {`import 'react-form-total/dist/assets/css/bootstrap_switch.css'\n`}
-                    {`import 'react-datetime/css/react-datetime.css'\n`}
-                  </Highlight>
+                  <SyntaxHighlighter className='react-code' style={styleCode}>
+{`import 'bootstrap/dist/css/bootstrap.min.css'\t
+import 'font-awesome-4.7.0/css/font-awesome.min.css'\t
+import 'react-form-total/dist/assets/css/react-form-total.css'\t
+import 'react-form-total/dist/assets/css/checkbox_radio.css'\t
+import 'react-form-total/dist/assets/css/bootstrap_switch.css'\t
+import 'react-datetime/css/react-datetime.css'\t`}
+                  </SyntaxHighlighter>
                   <p className='lead'>Import the default export and render in your component:</p>
-                  <Highlight>{gettingStarted}</Highlight>
+                  <SyntaxHighlighter className='react-code' style={styleCode}>{gettingStarted}</SyntaxHighlighter>
                 </section>
               </Element>
               <Element name='test3'>
-                <section>
-                  <h2>Simple Form Example</h2>
-                  <SimpleExample />
-                </section>
+                <SimpleExample styleCode={styleCode} />
               </Element>
               <Element name='test4'>
-                <section>
-                  <h2>Simple Form Example Controlled</h2>
-                  <SimpleExampleControlled toggleModal={this.toggleModal} />
-                </section>
+                <SimpleExampleControlled toggleModal={this.toggleModal} styleCode={styleCode} />
               </Element>
               <Element name='test5'>
-                <section>
-                  <h2>Complete Form Example Controlled</h2>
-                  <CompleteExample toggleModal={this.toggleModal} />
-                </section>
+                <CompleteExample toggleModal={this.toggleModal} styleCode={styleCode} />
               </Element>
             </Col>
           </Row>

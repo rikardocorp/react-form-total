@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import {Modal, ModalHeader, ModalBody, ModalFooter, Button} from 'reactstrap'
 import SyntaxHighlighter from 'react-syntax-highlighter'
-import { docco } from 'react-syntax-highlighter/styles/hljs'
+import { tomorrow } from 'react-syntax-highlighter/styles/hljs'
 
 import './assets/css/bootstrap.min.css'
 import './assets/css/font-awesome-4.7.0/css/font-awesome.min.css'
@@ -26,30 +26,34 @@ export default class App extends Component {
     }
   }
 
-  toggle = (content) => {
+  toggle = (content = null, isShow = false) => {
     console.log('content')
     console.log(content)
+    console.log(isShow)
+    console.log(typeof content)
+    const _content = isShow ? content : ''
+
     this.setState(state => {
       return {
         modal: {
           ...state.modal,
           show: !state.modal.show,
-          content: content
+          content: _content
         }
       }
     })
   }
 
   render () {
-    const closeBtn = <button className='close' onClick={this.toggle}>&times;</button>
-    const codeString = JSON.stringify(this.state.modal.content, null, '\t')
+    const closeBtn = <button className='close'>&times;</button>
+    const codeString = JSON.stringify(this.state.modal.content, null, 3)
     return (
       <React.Fragment>
         <Fullpage toggleModal={this.toggle} />
         <Modal isOpen={this.state.modal.show} toggle={this.toggle}>
-          <ModalHeader toggle={this.toggle} close={closeBtn}>Modal title</ModalHeader>
+          <ModalHeader toggle={this.toggle} close={closeBtn}>Form: Input values</ModalHeader>
           <ModalBody>
-            <SyntaxHighlighter style={docco}>{codeString}</SyntaxHighlighter>
+            <SyntaxHighlighter className='react-code' style={tomorrow}>{codeString}</SyntaxHighlighter>
           </ModalBody>
           <ModalFooter>
             <Button color='secondary' onClick={this.toggle}>Cancel</Button>
