@@ -1,6 +1,6 @@
 {
   "name": "react-form-total",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "This is a component to build a complete form, with validations and different types of inputs, using objects in JSON format.",
   "author": "rikardocorp",
   "license": "MIT",

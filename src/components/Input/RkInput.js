@@ -126,7 +126,7 @@ class RkInput extends Component {
   }
   handlerChangeProps = (newProps = null, newRules = undefined) => {
     let rules = (typeof newRules === 'object') ? {...newRules} : {...this.props.rules}
-    console.log('handlerChangeProps: ', newProps)
+    // console.log('handlerChangeProps: ', newProps)
     if (typeof newProps === 'object' || newProps === null) {
       this.setState(state => {
         if (newProps === null) {
@@ -193,7 +193,7 @@ class RkInput extends Component {
 
     let conteInput = null
     const input = (
-      <Input {...localProps} onFocus={this.showErrorTooltip} onBlur={this.hiddenErrorTooltip} onChange={this.changeValue} valid={valid} invalid={invalid} />
+      <Input type={this.props.type} {...localProps} onFocus={this.showErrorTooltip} onBlur={this.hiddenErrorTooltip} onChange={this.changeValue} valid={valid} invalid={invalid} />
     )
 
     const prepend = _prepend ? <InputGroupAddon addonType='prepend'>{_prepend}</InputGroupAddon> : null

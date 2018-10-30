@@ -12,7 +12,6 @@ const inputs = {
     input: {
       type: 'text',
       placeholder: 'Input type Text',
-      disabled: true
     },
     rules: {
       required
@@ -42,14 +41,14 @@ const inputs = {
     },
     input: {
       type: 'email',
-      placeholder: 'Type a valid email',
-      _grouping: {
-        grupo12: true
-      }
+      placeholder: 'Type a valid email'
     },
     rules: {
       required,
       email
+    },
+    grouping: {
+      grupo1: true
     }
   },
   __group_1: {

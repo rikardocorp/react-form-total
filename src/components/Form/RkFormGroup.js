@@ -161,7 +161,7 @@ class RkFormGroup extends Component {
       }
     }
 
-    const _inputComponent = this.selectTypeInput(this.props.inputProps, this.props.rules, this.props.grouping)
+    let _inputComponent = this.selectTypeInput(this.props.inputProps, this.props.rules, this.props.grouping)
 
     let {inputSize = null, labelSize = null, ...formGroupProps} = props.formGroup
     let {labelText = null, ...labelProps} = props.label
@@ -169,19 +169,19 @@ class RkFormGroup extends Component {
 
     // let inputComponent = this.state.inputComponent
     if (formGroupProps && formGroupProps.row) {
-      // inputComponent = <Col {...inputSize}>{ inputComponent }</Col>
     } else {
       labelSize = labelSize === null ? {sm: 12} : {...labelSize, sm: 12, md: 12, lg: 12}
       inputSize = inputSize === null ? {sm: 12} : {...inputSize, sm: 12, md: 12, lg: 12}
     }
-    let inputComponent = <Col {...inputSize}>{ _inputComponent }</Col>
-    let labelTag = labelText ? <Label {...labelProps} {...labelSize}>{labelText} {this.state.hidden ? ' Hidden' : ''}</Label> : null
+    let classNameInputSize = Object.keys(inputSize).map(it => 'col-' + it + '-' + inputSize[it])
+    let inputComponent = <div className={classNameInputSize.join(' ')}>{ _inputComponent }</div>
+    let labelTag = labelText ? <Label {...labelProps} {...labelSize}>{labelText}</Label> : null
 
     const hidden = this.state.hidden ? {display: 'none'} : null
 
     return (
       <Col {...itemSize} style={hidden}>
-        <FormGroup {...formGroupProps} >
+        <FormGroup {...formGroupProps} row>
           { labelTag }
           { inputComponent }
         </FormGroup>

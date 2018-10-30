@@ -71,26 +71,8 @@ html body .form-group .input-group > .form-control.rk-datetime:not(:last-child) 
   border-top-right-radius: 0;
   border-bottom-right-radius: 0; }
 
-.rkForm.rkForm-disabled > div{
+html body .rkForm.rkForm-disabled > div{
   opacity: 0.5;
-}
-
-html body .rkForm > .row > .col{
-  padding: 0;
-}
-
-html body .rkForm > .row > .col > .row > div[class^='col'] {
-  padding: 0;
-}
-
-html body .rkForm > .row > .col > .form-group > div {
-  padding: 0;
-}
-
-html body .rkForm > .row > .col > .form-group.row > div,
-html body .rkForm > .row > .col > .form-group.row > label{
-  padding-right: 15px;
-  padding-left: 15px;
 }
 
 html body .form-group .is-invalid~.invalid-tooltip{
