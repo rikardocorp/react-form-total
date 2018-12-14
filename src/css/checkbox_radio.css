@@ -171,4 +171,10 @@
   color: #ddd; }
 
 .radio.radio-inline {
+  display: inline-block;
+  margin-right: 6px;
   margin-top: 0; }
+
+.radio.radio-inline:last-child {
+  margin-right: 0;
+}

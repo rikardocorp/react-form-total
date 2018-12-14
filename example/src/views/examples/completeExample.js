@@ -7,6 +7,7 @@ import {required, maxLength} from '../../assets/validity/validators/'
 const inputs = {
   __group_1: {
     input1: {
+      // style: {background: 'orange'},
       size: {sm: 7},
       label: {
         labelText: 'Text Input'
@@ -24,6 +25,7 @@ const inputs = {
       }
     },
     input2: {
+      // className: 'bg-danger',
       size: {sm: 5},
       label: {
         labelText: 'Number Input'
@@ -65,7 +67,7 @@ const inputs = {
       type: 'multiSelectAdd',
       optionValue: 'id',
       optionLabel: 'label',
-      options: [{id:1, label: 'React'}, {id:2, label: 'Vuejs'}, {id:3, label: 'Angular'}]
+      options: [{id: 1, label: 'React'}, {id: 2, label: 'Vuejs'}, {id:3, label: 'Angular'}]
     },
     rules: {
       required
@@ -79,7 +81,7 @@ const inputs = {
       type: 'multiSelectTag',
       optionValue: 'id',
       optionLabel: 'label',
-      value: [{id:1, label: 'React', key: 1}, {id:2, label: 'Vuejs', key: 2}, {id:3, label: 'Angular', key: 3}]
+      value: [{id: 1, label: 'React', key: 1}, {id:2, label: 'Vuejs', key: 2}, {id:3, label: 'Angular', key: 3}]
     }
   },
   input6: {
@@ -102,7 +104,9 @@ const inputs = {
       input: {
         type: 'radio',
         color: 'success',
-        options: [{value: 'Python', color: 'warning'}, {value: 'Javascript', color: 'danger'}, 'React']
+        position: 'left',
+        inline: false,
+        options: [{value: 'Python', color: 'warning', position: 'left'}, {value: 'Javascript', color: 'danger', position: 'left'}, 'React']
       },
       rules: {
         required
@@ -155,6 +159,10 @@ class SimpleExample extends Component {
     }
   }
 
+  inputChangedHandler = (formName, name, value) => {
+    console.log(formName, name, value)
+  }
+
   inputFormHandler = (forname, callbackControls) => {
     this.setState(state => {
       return {
@@ -167,9 +175,17 @@ class SimpleExample extends Component {
   }
 
   handlerSubmit = () => {
+    const isValid = this.state.form.$isValid()
     const data = this.state.form.$getValues()
-    this.props.toggleModal(data)
+    // this.props.toggleModal(data)
+    console.log('handlerSubmit')
     console.log(data)
+    if (isValid) {
+    } else {
+      // this.state.form.$touch(true, 'group1', true)
+      this.state.form.$touch(true)
+    }
+    console.log(isValid)
   }
 
   handlerDisable = () => {
@@ -190,7 +206,12 @@ class SimpleExample extends Component {
             </SyntaxHighlighter>
           </React.Fragment>
         </UncontrolledCollapse>
-        <ReactFormTotal name={this.state.form.name} inputs={inputs} inputFormHandler={this.inputFormHandler} className='w-75 m-auto'>
+        <ReactFormTotal
+          name={this.state.form.name}
+          inputs={inputs}
+          inputChanged={this.inputChangedHandler}
+          inputFormHandler={this.inputFormHandler}
+          className='w-75 m-auto'>
           <div className='clearfix'>
             <Button color='danger' className='float-left' onClick={() => this.state.form.$reset()}>$reset</Button>
             <Button color='secondary' className='float-left ml-2' onClick={() => this.state.form.$touch()}>$touch</Button>

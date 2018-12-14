@@ -1,6 +1,6 @@
 {
   "name": "react-form-total",
-  "version": "2.0.7",
+  "version": "2.1.1",
   "description": "This is a component to build a complete form, with validations and different types of inputs, using objects in JSON format.",
   "author": "rikardocorp",
   "license": "MIT",
@@ -22,13 +22,13 @@
     "deploy": "gh-pages -d example/build"
   },
   "peerDependencies": {
-    "prop-types": "^15.5.4",
+    "prop-types": "^15.6.2",
     "react": "^15.0.0 || ^16.0.0",
     "react-dom": "^15.0.0 || ^16.0.0",
     "react-bootstrap-switch": "^15.5.3",
     "react-datetime": "^2.15.0",
     "react-radio-group": "^3.0.3",
-    "react-select": "^2.1.0",
+    "react-select": "^2.1.1",
     "reactstrap": "^6.4.0",
     "moment": "^2.22.2"
   },

@@ -44,7 +44,7 @@ class RkInput extends Component {
         name,
         this.handlerTouched,
         this.handlerReset,
-        () => this.handlerIsValidate(),
+        this.handlerIsValidate,
         this.handlerDisabledInput,
         this.handlerChangeValue,
         this.handlerChangeProps,
@@ -64,25 +64,28 @@ class RkInput extends Component {
     return undefined
   }
 
-  handlerTouched = (isTouch) => {
-    if (!isTouch) {
-      this.setState({touched: false, valid: undefined})
-    } else {
-      const value = this.state.value
-      const {isValid, msgError} = checkValidity(value, this.state.rules)
-      this.setState({
-        touched: true,
-        valid: isValid,
-        message: msgError,
-        showMessage: true
-      })
+  handlerTouched = (isTouch, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (!isTouch) {
+        this.setState({touched: false, valid: undefined})
+      } else {
+        const value = this.state.value
+        const {isValid, msgError} = checkValidity(value, this.state.rules)
+        this.setState({
+          touched: true,
+          valid: isValid,
+          message: msgError,
+          showMessage: true
+        })
+      }
     }
   }
   handlerReset = (group = null) => {
     const props = {...this.props.inputProps, ...this.state._localProps}
     const {name = ''} = props
     const _grouping = this.props.grouping
-    const outValue = this.props.type === 'number' ? 0 : ''
+    const outValue = this.props.type === 'number' ? null : ''
 
     if (group === null || _grouping[group]) {
       this.setState({
@@ -99,11 +102,16 @@ class RkInput extends Component {
       }
     }
   }
-  handlerIsValidate = () => {
+  handlerIsValidate = (group = null) => {
+    const _grouping = this.props.grouping
     const value = this.state.value
     if (!this.props.hidden) {
-      const {isValid} = checkValidity(value, this.state.rules)
-      return isValid
+      if (group === null || _grouping[group]) {
+        const {isValid} = checkValidity(value, this.state.rules)
+        return isValid
+      } else {
+        return true
+      }
     } else {
       return true
     }
@@ -112,7 +120,7 @@ class RkInput extends Component {
     const name = this.props.inputProps.name
     const value = newValue
     const {isValid, msgError} = checkValidity(value, this.state.rules)
-    const outValue = this.props.type === 'number' ? Number(value) : value
+    const outValue = this.props.type === 'number' ? ((value && value !== '') ? Number(value) : null) : value
     this.setState({
       value: value,
       outValue: outValue,

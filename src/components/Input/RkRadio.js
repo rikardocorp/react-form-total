@@ -11,7 +11,8 @@ class RkRadio extends Component {
     grouping: PropTypes.object,
     rules: PropTypes.object,
     getFunctions: PropTypes.func,
-    changed: PropTypes.func
+    changed: PropTypes.func,
+    hidden: PropTypes.bool
   }
 
   state = {
@@ -43,7 +44,7 @@ class RkRadio extends Component {
         name,
         this.handlerTouched,
         this.handlerReset,
-        () => this.handlerIsValidate(),
+        this.handlerIsValidate,
         this.handlerDisabledInput,
         this.handlerChangeValue,
         this.handlerChangeProps,
@@ -63,18 +64,21 @@ class RkRadio extends Component {
     return undefined
   }
 
-  handlerTouched = (isTouch) => {
-    if (!isTouch) {
-      this.setState({touched: false, valid: undefined})
-    } else {
-      const value = this.state.value
-      const {isValid, msgError} = checkValidity(value, this.state.rules)
-      this.setState({
-        touched: true,
-        valid: isValid,
-        message: msgError,
-        showMessage: true
-      })
+  handlerTouched = (isTouch, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (!isTouch) {
+        this.setState({touched: false, valid: undefined})
+      } else {
+        const value = this.state.value
+        const {isValid, msgError} = checkValidity(value, this.state.rules)
+        this.setState({
+          touched: true,
+          valid: isValid,
+          message: msgError,
+          showMessage: true
+        })
+      }
     }
   }
   handlerReset = (group = null) => {
@@ -86,7 +90,7 @@ class RkRadio extends Component {
       this.setState({
         value: null,
         outValue: null,
-        disabled: false,
+        // disabled: false,
         valid: undefined,
         touched: false,
         message: '',
@@ -97,10 +101,19 @@ class RkRadio extends Component {
       }
     }
   }
-  handlerIsValidate = () => {
+  handlerIsValidate = (group = null) => {
+    const _grouping = this.props.grouping
     const value = this.state.value
-    const {isValid} = checkValidity(value, this.state.rules)
-    return isValid
+    if (!this.props.hidden) {
+      if (group === null || _grouping[group]) {
+        const {isValid} = checkValidity(value, this.state.rules)
+        return isValid
+      } else {
+        return true
+      }
+    } else {
+      return true
+    }
   }
   handlerChangeValue = (newValue) => {
     const name = this.props.inputProps.name
@@ -171,11 +184,10 @@ class RkRadio extends Component {
       invalid = !this.state.valid ? !this.state.valid : undefined
     }
 
-    const conteClassName = 'rk-radio ' + (invalid ? 'is-invalid' : '') + (valid ? 'is-valid' : '')
-
     const {
       options = [],
       position = 'left',
+      inline = false,
       color = null,
       disabled = false,
       className = '',
@@ -183,19 +195,24 @@ class RkRadio extends Component {
       style = null} = props
     const name = this.props.inputProps.name
 
+    const conteClassName = 'rk-radio text-' + position + ' ' + (invalid ? 'is-invalid' : '') + (valid ? 'is-valid' : '')
+
     const _options = Array.isArray(options) ? options : []
     const radios = _options.map((it, key) => {
+      let _inline = inline ? 'radio-inline' : ''
       let _color = color ? 'radio-' + color : ''
       let _value = it
+      let _position = position
 
       if (typeof it === 'object') {
         _color = it.color ? 'radio-' + it.color : _color
         _value = it.value ? it.value : undefined
+        _position = it.position ? it.position : _position
       }
 
       const _name = name + '_' + key
       return (
-        <div className={'radio text-' + position + ' ' + _color + ' ' + className} key={key}>
+        <div className={'radio text-' + _position + ' ' + _inline + ' ' + _color + ' ' + className} key={key}>
           <Radio value={_value} id={_name} disabled={disabled} /><label htmlFor={_name}>{_value}</label>
         </div>
       )

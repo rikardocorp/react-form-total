@@ -36,7 +36,7 @@ class RkMultiSelect extends Component {
         name,
         this.handlerTouched,
         this.handlerReset,
-        () => this.handlerIsValidate(),
+        this.handlerIsValidate,
         this.handlerDisabledInput,
         this.handlerChangeValue,
         this.handlerChangeProps,
@@ -56,19 +56,22 @@ class RkMultiSelect extends Component {
     return undefined
   }
 
-  handlerTouched = (isTouch) => {
-    if (!isTouch) {
-      this.setState({touched: false, valid: undefined})
-    } else {
-      const value = this.state.value
-      const {isValid, msgError} = checkValidity(value, this.state.rules)
-      this.setState({
-        // value: value,
-        touched: true,
-        valid: isValid,
-        message: msgError,
-        showMessage: true
-      })
+  handlerTouched = (isTouch, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (!isTouch) {
+        this.setState({touched: false, valid: undefined})
+      } else {
+        const value = this.state.value
+        const {isValid, msgError} = checkValidity(value, this.state.rules)
+        this.setState({
+          // value: value,
+          touched: true,
+          valid: isValid,
+          message: msgError,
+          showMessage: true
+        })
+      }
     }
   }
   handlerReset = (group = null) => {
@@ -80,7 +83,7 @@ class RkMultiSelect extends Component {
       this.setState({
         value: null,
         outValue: null,
-        disabled: false,
+        // disabled: false,
         valid: undefined,
         touched: false,
         message: '',
@@ -91,10 +94,19 @@ class RkMultiSelect extends Component {
       }
     }
   }
-  handlerIsValidate = () => {
+  handlerIsValidate = (group = null) => {
+    const _grouping = this.props.grouping
     const value = this.state.value
-    const {isValid} = checkValidity(value, this.state.rules)
-    return isValid
+    if (!this.props.hidden) {
+      if (group === null || _grouping[group]) {
+        const {isValid} = checkValidity(value, this.state.rules)
+        return isValid
+      } else {
+        return true
+      }
+    } else {
+      return true
+    }
   }
 
   evaluateNewValue = (newValue, isMulti, optionValue, options) => {

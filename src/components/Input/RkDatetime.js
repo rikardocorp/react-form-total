@@ -50,7 +50,7 @@ class RkDatetime extends Component {
         name,
         this.handlerTouched,
         this.handlerReset,
-        () => this.handlerIsValidate(),
+        this.handlerIsValidate,
         this.handlerDisabledInput,
         this.handlerChangeValue,
         this.handlerChangeProps,
@@ -70,18 +70,21 @@ class RkDatetime extends Component {
     return undefined
   }
 
-  handlerTouched = (isTouch) => {
-    if (!isTouch) {
-      this.setState({touched: false, valid: undefined})
-    } else {
-      const value = this.state.value
-      const {isValid, msgError} = checkValidity(value, this.state.rules)
-      this.setState({
-        touched: true,
-        valid: isValid,
-        message: msgError,
-        showMessage: true
-      })
+  handlerTouched = (isTouch, group = null) => {
+    const _grouping = this.props.grouping
+    if (group === null || _grouping[group]) {
+      if (!isTouch) {
+        this.setState({touched: false, valid: undefined})
+      } else {
+        const value = this.state.value
+        const {isValid, msgError} = checkValidity(value, this.state.rules)
+        this.setState({
+          touched: true,
+          valid: isValid,
+          message: msgError,
+          showMessage: true
+        })
+      }
     }
   }
   handlerReset = (group = null) => {
@@ -93,7 +96,7 @@ class RkDatetime extends Component {
       this.setState({
         value: null,
         outValue: null,
-        disabled: false,
+        // disabled: false,
         valid: undefined,
         touched: false,
         message: '',
@@ -104,10 +107,19 @@ class RkDatetime extends Component {
       }
     }
   }
-  handlerIsValidate = () => {
+  handlerIsValidate = (group = null) => {
+    const _grouping = this.props.grouping
     const value = this.state.value
-    const {isValid} = checkValidity(value, this.state.rules)
-    return isValid
+    if (!this.props.hidden) {
+      if (group === null || _grouping[group]) {
+        const {isValid} = checkValidity(value, this.state.rules)
+        return isValid
+      } else {
+        return true
+      }
+    } else {
+      return true
+    }
   }
   handlerChangeValue = (newValue, isUTC = undefined) => {
     const name = this.props.inputProps.name

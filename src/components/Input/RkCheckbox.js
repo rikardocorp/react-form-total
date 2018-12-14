@@ -36,9 +36,9 @@ class RkCheckbox extends Component {
       const name = this.props.inputProps.name
       this.props.getFunctions(
         name,
-        () => this.handlerTouched(),
+        this.handlerTouched,
         this.handlerReset,
-        () => this.handlerIsValidate(),
+        this.handlerIsValidate,
         this.handlerDisabledInput,
         this.handlerChangeValue,
         this.handlerChangeProps,
@@ -62,7 +62,11 @@ class RkCheckbox extends Component {
     const _grouping = this.props.grouping
 
     if (group === null || _grouping[group]) {
-      this.setState({value: false, outValue: false, disabled: false})
+      this.setState({
+        value: false,
+        outValue: false,
+        // disabled: false
+      })
       if (this.props.changed) {
         this.props.changed(name, false, true)
       }

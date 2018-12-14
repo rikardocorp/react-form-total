@@ -132,10 +132,16 @@ class RkForm extends Component {
     }
   }
   // RESET ALL INPUTS FORM
-  touchForm = (isTouch = true) => {
-    Object.keys(this.state.items).map(it => {
-      this.state.items[it].$touch(isTouch)
-    })
+  touchForm = (value = true, key = null, byGroup = false) => {
+    if (key === null || byGroup) {
+      Object.keys(this.state.items).map(it => {
+        this.state.items[it].$touch(value, key)
+      })
+    } else {
+      if (this.state.items[key]) {
+        this.state.items[key].$touch(value)
+      }
+    }
   }
   // DISABLE ALL FORM
   disableAllForm = (value = null, group = null) => {
@@ -145,7 +151,7 @@ class RkForm extends Component {
     this.setState({disabled: value})
   }
   // TOUCH ALL INPUTS FORM
-  resetForm = (option = null) => {
+  resetForm = (option = null, byGroup = false) => {
     if (option === '_input_') {
       Object.keys(this.state.items).map(it => {
         this.state.items[it].$reset()
@@ -165,24 +171,34 @@ class RkForm extends Component {
       Object.keys(this.state.items).map(it => {
         this.state.items[it].$changeExtraProps(null)
       })
+    } else if (option !== null && !byGroup) {
+      // console.log(option, 'reset')
+      if (this.state.items[option]) this.state.items[option].$reset()
     } else {
-      Object.keys(this.state.items).map(it => {
-        this.state.items[it].$reset(option)
-      })
+      if (option === null || byGroup) {
+        Object.keys(this.state.items).map(it => {
+          this.state.items[it].$reset(option)
+        })
+      }
     }
   }
   // VALID ALL INPUTS FORM
-  validateForm = () => {
+  validateForm = (key = null, byGroup = false) => {
     let isValidate = true
-    let keys = Object.keys(this.state.items)
 
-    for (let i = 0; i < keys.length; i++) {
-      let key = keys[i]
-      let valid = this.state.items[key].$isValid()
-      if (valid === false) {
-        isValidate = false
-        break
+    if (key === null || byGroup) {
+      let keys = Object.keys(this.state.items)
+
+      for (let i = 0; i < keys.length; i++) {
+        let _key = keys[i]
+        let valid = this.state.items[_key].$isValid(key)
+        if (valid === false) {
+          isValidate = false
+          break
+        }
       }
+    } else {
+      isValidate = this.state.items[key] ? this.state.items[key].$isValid() : undefined
     }
     return isValidate
   }
@@ -214,6 +230,7 @@ class RkForm extends Component {
       } else {
         FormInputs[key]['input'] = {
           ...FormInputs[key]['input'],
+          // className: FormInputs[key]['className'],
           name: key
         }
         fInput = FormInputs[key]

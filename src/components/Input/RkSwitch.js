@@ -42,7 +42,7 @@ class RkSwitch extends Component {
         name,
         this.handlerTouched,
         this.handlerReset,
-        () => this.handlerIsValidate(),
+        this.handlerIsValidate,
         this.handlerDisabledInput,
         this.handlerChangeValue,
         this.handlerChangeProps,
@@ -66,11 +66,11 @@ class RkSwitch extends Component {
     const _grouping = this.props.grouping
 
     if (group === null || _grouping[group]) {
-      const realValue = typeof this.state.realValue === 'number' ? 1 : true
+      const realValue = typeof this.state.realValue === 'number' ? 0 : false
       this.setState({
-        value: true,
+        value: false,
         outValue: realValue,
-        disabled: false,
+        // disabled: false,
         valid: undefined,
         touched: false,
         message: '',

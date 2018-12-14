@@ -91,6 +91,8 @@ class RkFormInput extends Component {
       let rules = {...item.rules}
       let grouping = item.grouping ? {...item.grouping} : {}
       let name = item.input ? item.input.name : null
+      let className = item.className ? item.className : null
+      let style = item.style ? item.style : null
       // let inputTag = this.selectTypeInput(inputProps, rules, grouping)
 
       let formGroup = (
@@ -103,6 +105,8 @@ class RkFormInput extends Component {
           formGroup={item.formGroup}
           label={item.label}
           size={item.size}
+          className={className}
+          style={style}
           // inputComponent={inputTag}
           getFunction={this.props.formGroupFunctions}
           inputFunctions={this.props.inputFunctions}

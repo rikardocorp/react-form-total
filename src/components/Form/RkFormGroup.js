@@ -166,6 +166,8 @@ class RkFormGroup extends Component {
     let {inputSize = null, labelSize = null, ...formGroupProps} = props.formGroup
     let {labelText = null, ...labelProps} = props.label
     let {...itemSize} = props.size
+    const className = this.props.className ? this.props.className : null
+    let style = this.props.style ? this.props.style : null
 
     // let inputComponent = this.state.inputComponent
     if (formGroupProps && formGroupProps.row) {
@@ -177,10 +179,25 @@ class RkFormGroup extends Component {
     let inputComponent = <div className={classNameInputSize.join(' ')}>{ _inputComponent }</div>
     let labelTag = labelText ? <Label {...labelProps} {...labelSize}>{labelText}</Label> : null
 
-    const hidden = this.state.hidden ? {display: 'none'} : null
+    if (style) {
+      if (typeof style === 'object') {
+        if (this.state.hidden) {
+          style = {
+            ...style,
+            display: 'none'
+          }
+        } else {
+          style = {...style}
+        }
+      }
+    } else {
+      style = this.state.hidden ? {display: 'none'} : null
+    }
+
+    // const hidden = this.state.hidden ? {display: 'none'} : null
 
     return (
-      <Col {...itemSize} style={hidden}>
+      <Col {...itemSize} className={className} style={style}>
         <FormGroup {...formGroupProps} row>
           { labelTag }
           { inputComponent }
