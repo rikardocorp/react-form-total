@@ -106,7 +106,7 @@ const inputs = {
         color: 'success',
         position: 'left',
         inline: false,
-        options: [{value: 'Python', color: 'warning', position: 'left'}, {value: 'Javascript', color: 'danger', position: 'left'}, 'React']
+        options: [{label: 'Python', value: 'Py', color: 'warning', position: 'left'}, {label: 'Javascript', value: 'JS', color: 'danger', position: 'left'}, 'React']
       },
       rules: {
         required

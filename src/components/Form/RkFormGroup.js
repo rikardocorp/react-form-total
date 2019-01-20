@@ -171,6 +171,8 @@ class RkFormGroup extends Component {
 
     // let inputComponent = this.state.inputComponent
     if (formGroupProps && formGroupProps.row) {
+      labelSize = {sm: 6, md: 4}
+      inputSize = {sm: 6, md: 8}
     } else {
       labelSize = labelSize === null ? {sm: 12} : {...labelSize, sm: 12, md: 12, lg: 12}
       inputSize = inputSize === null ? {sm: 12} : {...inputSize, sm: 12, md: 12, lg: 12}

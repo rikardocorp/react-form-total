@@ -202,18 +202,20 @@ class RkRadio extends Component {
       let _inline = inline ? 'radio-inline' : ''
       let _color = color ? 'radio-' + color : ''
       let _value = it
+      let _label = it
       let _position = position
 
       if (typeof it === 'object') {
         _color = it.color ? 'radio-' + it.color : _color
         _value = it.value ? it.value : undefined
+        _label = it.label ? it.label : _value
         _position = it.position ? it.position : _position
       }
 
       const _name = name + '_' + key
       return (
         <div className={'radio text-' + _position + ' ' + _inline + ' ' + _color + ' ' + className} key={key}>
-          <Radio value={_value} id={_name} disabled={disabled} /><label htmlFor={_name}>{_value}</label>
+          <Radio value={_value} id={_name} disabled={disabled} /><label htmlFor={_name}>{_label}</label>
         </div>
       )
     })
